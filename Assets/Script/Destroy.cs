@@ -46,6 +46,6 @@ public class Destroy : MonoBehaviour
     public void TradeScore()
     {
 
-        tradeScore = ;
+        tradeScore = 20;
     }
 }
