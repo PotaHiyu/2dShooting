@@ -6,7 +6,7 @@ public class Destroy : MonoBehaviour
 {
     public bool isObject = false;
     const float DESTROY_TIME = 0.5f;
-    public float tradeScore = 0f;
+    public int tradeScore = 0;
     public bool isAnimationFinished = false;
     public GameManager gameManager;
     public GameObject player;
@@ -23,6 +23,7 @@ public class Destroy : MonoBehaviour
     {
         if (isAnimationFinished)
         {
+            TradeScore();
             Destroying();
         }
     }
@@ -45,5 +46,6 @@ public class Destroy : MonoBehaviour
     public void TradeScore()
     {
 
+        tradeScore = ;
     }
 }

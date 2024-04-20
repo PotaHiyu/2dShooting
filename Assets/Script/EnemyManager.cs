@@ -15,6 +15,7 @@ public class EnemyManager : MonoBehaviour
     public bool isUseGun = true;
     public bool canShoot = false;
     public bool isGoal = false;
+    public int score = 10;
     private GameManager gameManager;
 
     void Start()
