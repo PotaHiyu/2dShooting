@@ -10,6 +10,8 @@ using Mirror;
 
 public class PvPNetworkManager : NetworkManager
 {
+    public Transform leftPlayerStart;
+    public Transform rightPlayerStart;
     // Overrides the base singleton so we don't
     // have to cast to this type everywhere.
     public static new PvPNetworkManager singleton => (PvPNetworkManager)NetworkManager.singleton;
@@ -149,7 +151,10 @@ public class PvPNetworkManager : NetworkManager
     /// <param name="conn">Connection from client.</param>
     public override void OnServerAddPlayer(NetworkConnectionToClient conn)
     {
-        base.OnServerAddPlayer(conn);
+        //base.OnServerAddPlayer(conn);
+        Transform start = numPlayers == 0 ? leftPlayerStart : rightPlayerStart;
+        GameObject player = Instantiate(playerPrefab, start.position, start.rotation);
+        NetworkServer.AddPlayerForConnection(conn, player);
     }
 
     /// <summary>
