@@ -1,10 +1,8 @@
-using System.Collections;
-using System.Collections.Generic;
-//using System.Numerics;
 using UnityEngine;
 using TMPro;
+using Mirror;
 
-public class Move : MonoBehaviour
+public class NetworkMove : NetworkBehaviour
 {
     private float speed = 10f;
     public GameObject prefabBullet;
@@ -32,9 +30,9 @@ public class Move : MonoBehaviour
         pos = gameObject.transform.position;
         pos.x += 1f;
 
-        if (Input.GetKey(KeyCode.Space) && timer <= 0.0f && !limitMode)
+        if (isLocalPlayer && Input.GetKey(KeyCode.Space) && timer <= 0.0f && !limitMode)
         {
-            Instantiate(prefabBullet, pos, Quaternion.identity);
+            CmdShoot(pos, Quaternion.identity);
             timer = interval;
             if (showCount > 0 && useLimitMode)
             {
@@ -53,6 +51,13 @@ public class Move : MonoBehaviour
         {
             timer -= Time.deltaTime;
         }
+    }
+
+    [Command]
+    void CmdShoot(Vector2 position, Quaternion rotation)
+    {
+        GameObject bullet = Instantiate(prefabBullet, position, rotation);
+        NetworkServer.Spawn(bullet);
     }
 
     void FixedUpdate()

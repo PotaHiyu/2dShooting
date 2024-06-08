@@ -11,12 +11,12 @@ GameObject:
   - component: {fileID: 8951634115357911889}
   - component: {fileID: 8951634115357911890}
   - component: {fileID: 6491207371673804445}
-  - component: {fileID: 8951634115357911888}
   - component: {fileID: 1037204802}
   - component: {fileID: 1037204800}
   - component: {fileID: 5516140927851983423}
   - component: {fileID: 6354254962151096347}
   - component: {fileID: 2134577758788994127}
+  - component: {fileID: 2852249872968166585}
   m_Layer: 6
   m_Name: airplane
   m_TagString: Player
@@ -56,6 +56,8 @@ SpriteRenderer:
   m_ReflectionProbeUsage: 1
   m_RayTracingMode: 0
   m_RayTraceProcedural: 0
+  m_RayTracingAccelStructBuildFlagsOverride: 0
+  m_RayTracingAccelStructBuildFlags: 1
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
@@ -104,22 +106,6 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   health: 1
---- !u!114 &8951634115357911888
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 8951634115357911891}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 83884400257f4476aaa51a7e17d43c3d, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  prefabBullet: {fileID: 8500497175655295960, guid: 7615a9b95383f4322a588ef6ae9de31b, type: 3}
-  limitBullet: 5
-  useLimitMode: 0
-  showCountText: {fileID: 0}
 --- !u!114 &1037204802
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -145,6 +131,7 @@ BoxCollider2D:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 8951634115357911891}
   m_Enabled: 1
+  serializedVersion: 3
   m_Density: 1
   m_Material: {fileID: 0}
   m_IncludeLayers:
@@ -168,7 +155,8 @@ BoxCollider2D:
     m_Bits: 4294967295
   m_IsTrigger: 0
   m_UsedByEffector: 0
-  m_UsedByComposite: 0
+  m_CompositeOperation: 0
+  m_CompositeOrder: 0
   m_Offset: {x: 0, y: 0}
   m_SpriteTilingProperty:
     border: {x: 0, y: 0, z: 0, w: 0}
@@ -179,7 +167,6 @@ BoxCollider2D:
     drawMode: 0
     adaptiveTiling: 0
   m_AutoTiling: 0
-  serializedVersion: 2
   m_Size: {x: 1.2, y: 0.5}
   m_EdgeRadius: 0
 --- !u!50 &5516140927851983423
@@ -260,3 +247,22 @@ MonoBehaviour:
   rotationSensitivity: 0.01
   positionPrecision: 0.01
   scalePrecision: 0.01
+--- !u!114 &2852249872968166585
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8951634115357911891}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 7972dfed8061043ed8969342b405c4c8, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  syncDirection: 0
+  syncMode: 0
+  syncInterval: 0
+  prefabBullet: {fileID: 8500497175655295960, guid: 14ab30eab0246448bac49551e091637d, type: 3}
+  limitBullet: 5
+  useLimitMode: 0
+  showCountText: {fileID: 0}
