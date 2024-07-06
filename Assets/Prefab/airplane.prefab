@@ -1,5 +1,36 @@
 %YAML 1.1
 %TAG !u! tag:unity3d.com,2011:
+--- !u!1 &8529039013368836774
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 7840944053243998630}
+  m_Layer: 6
+  m_Name: BulletSpawnPoint
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &7840944053243998630
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8529039013368836774}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 1, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 8951634115357911889}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &8951634115357911891
 GameObject:
   m_ObjectHideFlags: 0
@@ -11,12 +42,14 @@ GameObject:
   - component: {fileID: 8951634115357911889}
   - component: {fileID: 8951634115357911890}
   - component: {fileID: 6491207371673804445}
-  - component: {fileID: 8951634115357911888}
   - component: {fileID: 1037204802}
+  - component: {fileID: -3295205959184582954}
   - component: {fileID: 1037204800}
   - component: {fileID: 5516140927851983423}
   - component: {fileID: 6354254962151096347}
   - component: {fileID: 2134577758788994127}
+  - component: {fileID: -5769589297917667033}
+  - component: {fileID: 2483085285770706411}
   m_Layer: 6
   m_Name: airplane
   m_TagString: Player
@@ -36,7 +69,8 @@ Transform:
   m_LocalPosition: {x: -5, y: 0, z: 0}
   m_LocalScale: {x: 0.8, y: 0.8, z: 1}
   m_ConstrainProportionsScale: 0
-  m_Children: []
+  m_Children:
+  - {fileID: 7840944053243998630}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!212 &8951634115357911890
@@ -104,22 +138,6 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   health: 1
---- !u!114 &8951634115357911888
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 8951634115357911891}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 83884400257f4476aaa51a7e17d43c3d, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  prefabBullet: {fileID: 8500497175655295960, guid: 7615a9b95383f4322a588ef6ae9de31b, type: 3}
-  limitBullet: 5
-  useLimitMode: 0
-  showCountText: {fileID: 0}
 --- !u!114 &1037204802
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -137,6 +155,26 @@ MonoBehaviour:
   isAnimationFinished: 0
   gameManager: {fileID: 0}
   player: {fileID: 8951634115357911891}
+--- !u!114 &-3295205959184582954
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8951634115357911891}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 9db7a56bdef914a47b3fc02fd01b3764, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  syncDirection: 0
+  syncMode: 0
+  syncInterval: 0
+  prefabBullet: {fileID: 8500497175655295960, guid: 14ab30eab0246448bac49551e091637d, type: 3}
+  bulletSpawnPoint: {fileID: 7840944053243998630}
+  limitBullet: 5
+  useLimitMode: 0
+  showCountText: {fileID: 0}
 --- !u!61 &1037204800
 BoxCollider2D:
   m_ObjectHideFlags: 0
@@ -260,3 +298,35 @@ MonoBehaviour:
   rotationSensitivity: 0.01
   positionPrecision: 0.01
   scalePrecision: 0.01
+--- !u!114 &-5769589297917667033
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8951634115357911891}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 5016ab905509f4fe09ed4389dfaca8e4, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  syncDirection: 0
+  syncMode: 0
+  syncInterval: 0
+  prefab: {fileID: 1776809099321892351, guid: 1c8700e6b93a44a45ada777d7b171ead, type: 3}
+  skillPosition: {fileID: 7840944053243998630}
+--- !u!114 &2483085285770706411
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8951634115357911891}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 8b37cdb5877e84513b705ce8c141f1fb, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  syncDirection: 0
+  syncMode: 0
+  syncInterval: 0

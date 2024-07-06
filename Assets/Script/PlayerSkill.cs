@@ -1,18 +1,31 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using Mirror;
 
-public class PlayerSkill : MonoBehaviour
+public class PlayerSkill : NetworkBehaviour
 {
-    // Start is called before the first frame update
-    void Start()
-    {
-        
-    }
+    public GameObject prefab;
+    public Transform skillPosition;
+    [SyncVar]
+    private float count = 1;
 
-    // Update is called once per frame
     void Update()
     {
-        
+        if (Input.GetKeyDown(KeyCode.C))
+        {
+            CmdSpawnSkill(skillPosition.position);
+        }
+    }
+
+    [Command]
+    void CmdSpawnSkill(Vector2 pos)
+    {
+        if (count >= 1)
+        {
+            GameObject go = Instantiate(prefab, pos, Quaternion.identity);
+            NetworkServer.Spawn(go);
+            count -= 1;
+        }
     }
 }
