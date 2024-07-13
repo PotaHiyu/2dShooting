@@ -6,7 +6,7 @@ public class NetworkMove : NetworkBehaviour
 {
     private float speed = 10f;
     public GameObject prefabBullet;
-    private Vector2 pos;
+    public Transform bulletSpawnPoint;
     private float interval = 0.5f;
     private float timer = 0.0f;
     public int limitBullet = 0;
@@ -27,12 +27,9 @@ public class NetworkMove : NetworkBehaviour
 
     void Update()
     {
-        pos = gameObject.transform.position;
-        pos.x += 1f;
-
         if (isLocalPlayer && Input.GetKey(KeyCode.Space) && timer <= 0.0f && !limitMode)
         {
-            CmdShoot(pos, Quaternion.identity);
+            CmdShoot(bulletSpawnPoint.position, transform.rotation);
             timer = interval;
             if (showCount > 0 && useLimitMode)
             {
