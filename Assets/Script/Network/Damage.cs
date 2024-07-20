@@ -10,10 +10,22 @@ public class Damage : NetworkBehaviour
 
     public void OnTriggerEnter2D(Collider2D other)
     {
-        Debug.Log("a");
+        Debug.Log($"Damage.OnTriggerEnter2D isServer? {isServer}");
         Health healthScript = other.GetComponent<Health>();
         Debug.Log(healthScript);
         if (healthScript == null) return;
+        Owner otherOwner = other.GetComponent<Owner>();
+        uint otherId;
+        if (otherOwner == null)
+        {
+            otherId = other.GetComponent<NetworkIdentity>().netId;
+        }
+        else
+        {
+            otherId = otherOwner.owner;
+        }
+        Owner myOwner = GetComponent<Owner>();       
+        if (otherId == myOwner.owner) return;
         healthScript.TakeDamage(damage);
         if (DestroyOnHit)
         {
