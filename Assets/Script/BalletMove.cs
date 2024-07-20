@@ -4,7 +4,6 @@ using UnityEngine;
 
 public class BalletMove : MonoBehaviour
 {
-    public bool isReverse;
     public bool isPlayer;
     public float speed;
     private Destroy destroyScript;
@@ -22,15 +21,15 @@ public class BalletMove : MonoBehaviour
         transform.position = pos;
     }
 
-    private void OnTriggerEnter2D(Collider2D collision)
-    {
-        if (collision.gameObject.CompareTag("Player") && isPlayer == false)
+        void OnTriggerEnter2D(Collider2D collision)
         {
-            destroyScript.Destroying();
+            if (collision.gameObject.CompareTag("Player") && isPlayer == false)
+            {
+                destroyScript.Destroying();
+            }
+            else if (collision.gameObject.CompareTag("Enemy") && isPlayer == true)
+            {
+                destroyScript.Destroying();
+            }
         }
-        else if (collision.gameObject.CompareTag("Enemy") && isPlayer == true)
-        {
-            destroyScript.Destroying();
-        }
-    }
 }
