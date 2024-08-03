@@ -24,7 +24,7 @@ public class Damage : NetworkBehaviour
         {
             otherId = otherOwner.owner;
         }
-        Owner myOwner = GetComponent<Owner>();       
+        Owner myOwner = GetComponent<Owner>();
         if (otherId == myOwner.owner) return;
         healthScript.TakeDamage(damage);
         if (DestroyOnHit)

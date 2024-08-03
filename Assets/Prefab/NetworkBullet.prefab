@@ -16,6 +16,7 @@ GameObject:
   - component: {fileID: -805942271816360268}
   - component: {fileID: 8991563664393184168}
   - component: {fileID: -891558460463979680}
+  - component: {fileID: -9139261500380510423}
   m_Layer: 0
   m_Name: NetworkBullet
   m_TagString: bullet
@@ -234,3 +235,20 @@ MonoBehaviour:
   syncInterval: 0
   damage: 50
   DestroyOnHit: 1
+--- !u!114 &-9139261500380510423
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8500497175655295960}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: c684f5fd969ae44debfc76a7a1bc2ecf, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  syncDirection: 0
+  syncMode: 0
+  syncInterval: 0
+  owner: 0
+  isBullet: 1

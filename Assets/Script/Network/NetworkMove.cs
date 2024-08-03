@@ -58,7 +58,8 @@ public class NetworkMove : NetworkBehaviour
     {
         GameObject bullet = Instantiate(prefabBullet, pos, rotation);
         NetworkServer.Spawn(bullet);
-        bullet.GetComponent<Owner>().owner = GetComponent<NetworkIdentity>().netId;
+        bullet.GetComponent<Owner>().owner = netId;
+        Debug.Log("BulletNetID is " + bullet.GetComponent<Owner>().owner);
     }
 
     void FixedUpdate()

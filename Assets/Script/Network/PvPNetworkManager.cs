@@ -2,6 +2,8 @@ using System;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 using Mirror;
+using System.Collections;
+
 
 /*
 	Documentation: https://mirror-networking.gitbook.io/docs/components/network-manager
@@ -15,6 +17,9 @@ public class PvPNetworkManager : NetworkManager
     // Overrides the base singleton so we don't
     // have to cast to this type everywhere.
     public static new PvPNetworkManager singleton => (PvPNetworkManager)NetworkManager.singleton;
+    private bool subsceneLoaded = false;
+    [Scene]
+    public string gameScene;
 
     /// <summary>
     /// Runs on both Server and Client
@@ -226,7 +231,23 @@ public class PvPNetworkManager : NetworkManager
     /// This is invoked when a server is started - including when a host is started.
     /// <para>StartServer has multiple signatures, but they all cause this hook to be called.</para>
     /// </summary>
-    public override void OnStartServer() { }
+    public override void OnStartServer()
+    {
+        StartCoroutine(ServerLoadSubScene());
+    }
+
+    IEnumerator ServerLoadSubScene()
+    {
+        subsceneLoaded = false;
+        yield return SceneManager.LoadSceneAsync(gameScene, new LoadSceneParameters
+        {
+            loadSceneMode = LoadSceneMode.Additive,
+            localPhysicsMode = LocalPhysicsMode.Physics2D
+        });
+
+        Scene newScene = SceneManager.GetSceneAt(SceneManager.sceneCount - 1);
+        subsceneLoaded = true;
+    }
 
     /// <summary>
     /// This is invoked when the client is started.
