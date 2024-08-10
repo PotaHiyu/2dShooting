@@ -27,6 +27,9 @@ public class PlayerSkill : NetworkBehaviour
             NetworkServer.Spawn(go);
             count -= 1;
             go.GetComponent<Owner>().owner = netId;
+            var netManager = FindFirstObjectByType<PvPNetworkManager>();
+            if (netManager == null) return; // TODO: Error handling!
+            netManager.MoveToScene(connectionToClient, go);
         }
     }
 }

@@ -3,6 +3,38 @@ using UnityEngine;
 using UnityEngine.SceneManagement;
 using Mirror;
 using System.Collections;
+using System.Collections.Generic;
+
+
+public class Match
+{
+    public Match(Scene scene, int maxPlayers)
+    {
+        GameScene = scene;
+        MaxPlayers = maxPlayers;
+        NumberOfPlayers = 0;
+    }
+
+    public bool AddPlayer()
+    {
+        NumberOfPlayers++;
+        Debug.Log($"Added: Match now has {NumberOfPlayers} / {MaxPlayers} players...");
+        return IsFull;
+    }
+
+    public Scene GameScene { get; }
+    public bool IsEmpty => NumberOfPlayers <= 0;
+    public bool IsFull => NumberOfPlayers >= MaxPlayers;
+    public int MaxPlayers { get; }
+    public int NumberOfPlayers { get; private set; }
+
+    public bool RemovePlayer()
+    {
+        NumberOfPlayers--;
+        Debug.Log($"Removed: Match now has {NumberOfPlayers} / {MaxPlayers} players...");
+        return IsEmpty;
+    }
+}
 
 
 /*
@@ -17,9 +49,12 @@ public class PvPNetworkManager : NetworkManager
     // Overrides the base singleton so we don't
     // have to cast to this type everywhere.
     public static new PvPNetworkManager singleton => (PvPNetworkManager)NetworkManager.singleton;
-    private bool subsceneLoaded = false;
+
     [Scene]
     public string gameScene;
+    private Match currentMatch = null;
+    private bool matchReady => currentMatch != null;
+    private Dictionary<int, Match> clientMatches = new Dictionary<int, Match>();
 
     /// <summary>
     /// Runs on both Server and Client
@@ -156,10 +191,50 @@ public class PvPNetworkManager : NetworkManager
     /// <param name="conn">Connection from client.</param>
     public override void OnServerAddPlayer(NetworkConnectionToClient conn)
     {
-        //base.OnServerAddPlayer(conn);
-        Transform start = numPlayers == 0 ? leftPlayerStart : rightPlayerStart;
-        GameObject player = Instantiate(playerPrefab, start.position, start.rotation);
-        NetworkServer.AddPlayerForConnection(conn, player);
+        StartCoroutine(OnServerAddPlayerDelayed(conn));
+    }
+
+    IEnumerator OnServerAddPlayerDelayed(NetworkConnectionToClient conn)
+    {
+        // Make sure there is a subscene ready.
+        while (!matchReady) yield return null;
+
+        // Tell the client to load the game subscene.
+        conn.Send(new SceneMessage { sceneName = gameScene, sceneOperation = SceneOperation.LoadAdditive });
+
+        // Wait for end of frame before adding the player to ensure Scene Message goes first
+        yield return new WaitForEndOfFrame();
+        base.OnServerAddPlayer(conn);
+
+        // Do this only on server, not on clients
+        // This is what allows Scene Interest Management
+        // to isolate matches per scene instance on server.
+        SceneManager.MoveGameObjectToScene(conn.identity.gameObject, currentMatch.GameScene);
+        clientMatches.Add(conn.connectionId, currentMatch);
+        Debug.Log($"Moved player for {conn.connectionId} to scene...");
+        if (currentMatch.AddPlayer())
+        {
+            Debug.Log($"Current match has {currentMatch.NumberOfPlayers} players... loading new one");
+            currentMatch = null;
+            StartCoroutine(ServerLoadSubScene());
+        }
+        else
+        {
+            Debug.Log($"Current match has {currentMatch.NumberOfPlayers} players... continuing");
+        }
+    }
+
+    public void MoveToScene(NetworkConnectionToClient conn, GameObject obj)
+    {
+        int id = conn.connectionId;
+        if (clientMatches.ContainsKey(id) && clientMatches[id].GameScene.IsValid())
+        {
+            SceneManager.MoveGameObjectToScene(obj, clientMatches[id].GameScene);
+        }
+        else
+        {
+            // TODO: error handling.
+        }
     }
 
     /// <summary>
@@ -170,6 +245,20 @@ public class PvPNetworkManager : NetworkManager
     public override void OnServerDisconnect(NetworkConnectionToClient conn)
     {
         base.OnServerDisconnect(conn);
+        int id = conn.connectionId;
+        if (!clientMatches.ContainsKey(id)) return;
+        Match match = clientMatches[id];
+        clientMatches.Remove(id);
+        if (match.RemovePlayer())
+        {
+            StartCoroutine(UnloadScene(match.GameScene));
+        }
+    }
+
+    IEnumerator UnloadScene(Scene scene)
+    {
+        if (scene.IsValid()) yield return SceneManager.UnloadSceneAsync(scene);
+        yield return Resources.UnloadUnusedAssets();
     }
 
     /// <summary>
@@ -238,7 +327,7 @@ public class PvPNetworkManager : NetworkManager
 
     IEnumerator ServerLoadSubScene()
     {
-        subsceneLoaded = false;
+        Debug.Log("Loading new subscene for 1v1....");
         yield return SceneManager.LoadSceneAsync(gameScene, new LoadSceneParameters
         {
             loadSceneMode = LoadSceneMode.Additive,
@@ -246,7 +335,7 @@ public class PvPNetworkManager : NetworkManager
         });
 
         Scene newScene = SceneManager.GetSceneAt(SceneManager.sceneCount - 1);
-        subsceneLoaded = true;
+        currentMatch = new Match(newScene, 2);
     }
 
     /// <summary>
@@ -262,12 +351,50 @@ public class PvPNetworkManager : NetworkManager
     /// <summary>
     /// This is called when a server is stopped - including when a host is stopped.
     /// </summary>
-    public override void OnStopServer() { }
+    public override void OnStopServer()
+    {
+        NetworkServer.SendToAll(new SceneMessage { sceneName = gameScene, sceneOperation = SceneOperation.UnloadAdditive });
+        StartCoroutine(ServerUnloadSubScenes());
+    }
+
+    // Unload the subScenes and unused assets and clear the subScenes list.
+    IEnumerator ServerUnloadSubScenes()
+    {
+        var clientIds = clientMatches.Keys;
+        foreach (var key in clientIds)
+        {
+            if (clientMatches[key].GameScene.IsValid())
+            {
+                yield return SceneManager.UnloadSceneAsync(clientMatches[key].GameScene);
+                clientMatches.Remove(key);
+            }
+        }
+
+        clientMatches.Clear();
+        if (matchReady && currentMatch.GameScene.IsValid())
+            yield return SceneManager.UnloadSceneAsync(currentMatch.GameScene);
+        currentMatch = null;
+
+        yield return Resources.UnloadUnusedAssets();
+    }
 
     /// <summary>
     /// This is called when a client is stopped.
     /// </summary>
-    public override void OnStopClient() { }
+    public override void OnStopClient()
+    {
+        // Make sure we're not in ServerOnly mode now after stopping host client
+        if (mode == NetworkManagerMode.Offline)
+            StartCoroutine(ClientUnloadSubScenes());
+    }
+
+    // Unload all but the active scene, which is the "container" scene
+    IEnumerator ClientUnloadSubScenes()
+    {
+        for (int index = 0; index < SceneManager.sceneCount; index++)
+            if (SceneManager.GetSceneAt(index) != SceneManager.GetActiveScene())
+                yield return SceneManager.UnloadSceneAsync(SceneManager.GetSceneAt(index));
+    }
 
     #endregion
 }

@@ -60,6 +60,9 @@ public class NetworkMove : NetworkBehaviour
         NetworkServer.Spawn(bullet);
         bullet.GetComponent<Owner>().owner = netId;
         Debug.Log("BulletNetID is " + bullet.GetComponent<Owner>().owner);
+        var netManager = FindFirstObjectByType<PvPNetworkManager>();
+        if (netManager == null) return; // TODO: Error handling!
+        netManager.MoveToScene(connectionToClient, bullet);
     }
 
     void FixedUpdate()
