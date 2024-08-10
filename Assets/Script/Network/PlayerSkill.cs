@@ -26,6 +26,7 @@ public class PlayerSkill : NetworkBehaviour
             GameObject go = Instantiate(prefab, pos, Quaternion.identity);
             NetworkServer.Spawn(go);
             count -= 1;
+            go.GetComponent<Owner>().owner = netId;
         }
     }
 }

@@ -5,7 +5,7 @@ using UnityEngine;
 using TMPro;
 using Mirror;
 
-public class NetworkMoveMove : NetworkBehaviour
+public class NetworkMove : NetworkBehaviour
 {
     private float speed = 10f;
     public GameObject prefabBullet;
@@ -58,6 +58,8 @@ public class NetworkMoveMove : NetworkBehaviour
     {
         GameObject bullet = Instantiate(prefabBullet, pos, rotation);
         NetworkServer.Spawn(bullet);
+        bullet.GetComponent<Owner>().owner = netId;
+        Debug.Log("BulletNetID is " + bullet.GetComponent<Owner>().owner);
     }
 
     void FixedUpdate()
