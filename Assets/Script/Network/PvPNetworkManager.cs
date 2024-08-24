@@ -3,7 +3,37 @@ using UnityEngine;
 using UnityEngine.SceneManagement;
 using Mirror;
 using System.Collections;
+using System.Collections.Generic;
 
+public class Match
+{
+    public Match(Scene scene, int maxPlayers)
+    {
+        GameScene = scene;
+        MaxPlayers = maxPlayers;
+        NumberOfPlayers = 0;
+    }
+
+    public bool AddPlayer()
+    {
+        NumberOfPlayers++;
+        Debug.Log($"Added: Match now has {NumberOfPlayers} / {MaxPlayers} players...");
+        return IsFull;
+    }
+
+    public Scene GameScene { get; }
+    public bool IsEmpty => NumberOfPlayers <= 0;
+    public bool IsFull => NumberOfPlayers >= MaxPlayers;
+    public int MaxPlayers { get; }
+    public int NumberOfPlayers { get; private set; }
+
+    public bool RemovePlayer()
+    {
+        NumberOfPlayers--;
+        Debug.Log($"Removed: Match now has {NumberOfPlayers} / {MaxPlayers} players...");
+        return IsEmpty;
+    }
+}
 
 /*
 	Documentation: https://mirror-networking.gitbook.io/docs/components/network-manager
@@ -20,6 +50,10 @@ public class PvPNetworkManager : NetworkManager
     private bool subsceneLoaded = false;
     [Scene]
     public string gameScene;
+    private Match currentMatch = null;
+    private bool matchReady => currentMatch != null;
+    private Dictionary<int, Match> clientMatches = new Dictionary<int, Match>();
+
 
     /// <summary>
     /// Runs on both Server and Client
@@ -156,10 +190,26 @@ public class PvPNetworkManager : NetworkManager
     /// <param name="conn">Connection from client.</param>
     public override void OnServerAddPlayer(NetworkConnectionToClient conn)
     {
-        //base.OnServerAddPlayer(conn);
-        Transform start = numPlayers == 0 ? leftPlayerStart : rightPlayerStart;
-        GameObject player = Instantiate(playerPrefab, start.position, start.rotation);
-        NetworkServer.AddPlayerForConnection(conn, player);
+        StartCoroutine(OnServerAddPlayerDelayed(conn));
+    }
+
+    IEnumerator OnServerAddPlayerDelayed(NetworkConnectionToClient conn)
+    {
+        while (!matchReady) yield return null;
+        conn.Send(new SceneMessage { sceneName = gameScene, sceneOperation =
+            SceneOperation.LoadAdditive });
+        yield return new WaitForEndOfFrame();
+        base.OnServerAddPlayer(conn);
+
+        SceneManager.MoveGameObjectToScene(conn.identity.gameObject,
+            currentMatch.GameScene);
+        clientMatches.Add(conn.connectionId, currentMatch);
+
+        if (currentMatch.AddPlayer())
+        {
+            currentMatch = null;
+            StartCoroutine(ServerLoadSubScene());
+        }
     }
 
     /// <summary>
@@ -238,7 +288,6 @@ public class PvPNetworkManager : NetworkManager
 
     IEnumerator ServerLoadSubScene()
     {
-        subsceneLoaded = false;
         yield return SceneManager.LoadSceneAsync(gameScene, new LoadSceneParameters
         {
             loadSceneMode = LoadSceneMode.Additive,
@@ -246,7 +295,7 @@ public class PvPNetworkManager : NetworkManager
         });
 
         Scene newScene = SceneManager.GetSceneAt(SceneManager.sceneCount - 1);
-        subsceneLoaded = true;
+        currentMatch = new Match(newScene, 2);
     }
 
     /// <summary>
