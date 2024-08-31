@@ -23,10 +23,14 @@ public class PlayerSkill : NetworkBehaviour
     {
         if (count >= 1)
         {
+            var pvpNetworkManager = FindFirstObjectByType<PvPNetworkManager>();
+            if (pvpNetworkManager == null) return;
+
             GameObject go = Instantiate(prefab, pos, Quaternion.identity);
             NetworkServer.Spawn(go);
-            count -= 1;
+            pvpNetworkManager.MoveToScene(connectionToClient, go);
             go.GetComponent<Owner>().owner = netId;
+            count -= 1;
         }
     }
 }
