@@ -4,15 +4,21 @@ using UnityEngine;
 
 public class OriginalSkill : MonoBehaviour
 {
-    // Start is called before the first frame update
-    void Start()
-    {
-        
-    }
+    public Vector2 startPos;
+    public Vector2 finishPos;
+    private float speed;
+    public GameObject skill;
+    public bool skillStartPosUpdate;
 
-    // Update is called once per frame
     void Update()
     {
-        
+        if (skillStartPosUpdate)
+        {
+            startPos = skill.transform.position;
+            if (Input.GetKeyDown(KeyCode.V))
+            {
+                skill.transform.position = Vector2.Lerp(startPos, finishPos, speed);
+            }
+        }
     }
 }

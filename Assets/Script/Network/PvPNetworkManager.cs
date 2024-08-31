@@ -212,6 +212,15 @@ public class PvPNetworkManager : NetworkManager
         }
     }
 
+    public void MoveToScene(NetworkConnectionToClient conn, GameObject obj)
+    {
+        int id = conn.connectionId;
+        if (clientMatches.ContainsKey(id) && clientMatches[id].GameScene.IsValid())
+        {
+            SceneManager.MoveGameObjectToScene(obj, clientMatches[id].GameScene);
+        }
+    }
+
     /// <summary>
     /// Called on the server when a client disconnects.
     /// <para>This is called on the Server when a Client disconnects from the Server. Use an override to decide what should happen when a disconnection is detected.</para>
