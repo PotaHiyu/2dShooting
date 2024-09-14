@@ -56,12 +56,13 @@ public class NetworkMove : NetworkBehaviour
     [Command]
     void CmdShoot(Vector2 pos, Quaternion rotation)
     {
+        var netManager = FindFirstObjectByType<PvPNetworkManager>();
+        if (netManager == null) return; // TODO: Error handling!
+
         GameObject bullet = Instantiate(prefabBullet, pos, rotation);
         NetworkServer.Spawn(bullet);
         bullet.GetComponent<Owner>().owner = netId;
         Debug.Log("BulletNetID is " + bullet.GetComponent<Owner>().owner);
-        var netManager = FindFirstObjectByType<PvPNetworkManager>();
-        if (netManager == null) return; // TODO: Error handling!
         netManager.MoveToScene(connectionToClient, bullet);
     }
 
