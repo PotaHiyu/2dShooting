@@ -2,18 +2,21 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using Mirror;
+using UnityEngine.Events;
 
 public class Health : NetworkBehaviour
 {
-    [SyncVar]
+    [SyncVar(hook = nameof(HealthHandler))]
     public int health;
     public int maxHealth = 100;
     public GameObject deathVFX;
     public float deathTime = 2f;
+    public UnityAction onPlayerDied;
 
     void Start()
     {
         health = maxHealth;
+        onPlayerDied += OnPlayerDied;
     }
 
     public void TakeDamage(int amount)
@@ -25,23 +28,37 @@ public class Health : NetworkBehaviour
         }
     }
 
-    IEnumerator DestroyAction()
+    void HealthHandler (int oldHealth, int newHealth)
     {
-        // player died callback
-        if (deathVFX) CmdSpawnVFX();
-        yield return new WaitForSeconds(deathTime);
-        // player will disconnect
-        Destroy(gameObject);
+        if (health == 0 && isClient)
+        {
+            if (isLocalPlayer)
+            {
+                StartCoroutine(DestroyAction());
+            }
+            if (onPlayerDied != null) onPlayerDied.Invoke();
+        }
     }
 
-    [Command]
-    void CmdSpawnVFX()
+    public void OnPlayerDied()
     {
-        var pvpNetworkManager = FindFirstObjectByType<PvPNetworkManager>();
-        if (pvpNetworkManager == null) return;
+        if (deathVFX && isClient) SpawnVFX();
+        var renderer = GetComponent<SpriteRenderer>();
+        if (renderer != null) renderer.enabled = false;
+    }
 
-        GameObject vfx = Instantiate(deathVFX, transform);
-        NetworkServer.Spawn(vfx);
-        pvpNetworkManager.MoveToScene(connectionToClient, vfx);
+    IEnumerator DestroyAction()
+    {
+        if (isLocalPlayer)
+        {
+            yield return new WaitForSeconds(deathTime);
+            connectionToServer.Disconnect();
+        }
+        
+    }
+
+    void SpawnVFX()
+    {
+        Instantiate(deathVFX, transform.position, Quaternion.identity);
     }
 }
