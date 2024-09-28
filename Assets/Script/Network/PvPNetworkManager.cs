@@ -5,7 +5,6 @@ using Mirror;
 using System.Collections;
 using System.Collections.Generic;
 
-
 public class Match
 {
     public Match(Scene scene, int maxPlayers)
@@ -36,7 +35,6 @@ public class Match
     }
 }
 
-
 /*
 	Documentation: https://mirror-networking.gitbook.io/docs/components/network-manager
 	API Reference: https://mirror-networking.com/docs/api/Mirror.NetworkManager.html
@@ -55,6 +53,7 @@ public class PvPNetworkManager : NetworkManager
     private Match currentMatch = null;
     private bool matchReady => currentMatch != null;
     private Dictionary<int, Match> clientMatches = new Dictionary<int, Match>();
+
 
     /// <summary>
     /// Runs on both Server and Client
@@ -200,7 +199,8 @@ public class PvPNetworkManager : NetworkManager
         while (!matchReady) yield return null;
 
         // Tell the client to load the game subscene.
-        conn.Send(new SceneMessage { sceneName = gameScene, sceneOperation = SceneOperation.LoadAdditive });
+        conn.Send(new SceneMessage { sceneName = gameScene, sceneOperation =
+            SceneOperation.LoadAdditive });
 
         // Wait for end of frame before adding the player to ensure Scene Message goes first
         yield return new WaitForEndOfFrame();
@@ -209,18 +209,16 @@ public class PvPNetworkManager : NetworkManager
         // Do this only on server, not on clients
         // This is what allows Scene Interest Management
         // to isolate matches per scene instance on server.
-        SceneManager.MoveGameObjectToScene(conn.identity.gameObject, currentMatch.GameScene);
+        SceneManager.MoveGameObjectToScene(conn.identity.gameObject,
+            currentMatch.GameScene);
         clientMatches.Add(conn.connectionId, currentMatch);
+
         Debug.Log($"Moved player for {conn.connectionId} to scene...");
         if (currentMatch.AddPlayer())
         {
             Debug.Log($"Current match has {currentMatch.NumberOfPlayers} players... loading new one");
             currentMatch = null;
             StartCoroutine(ServerLoadSubScene());
-        }
-        else
-        {
-            Debug.Log($"Current match has {currentMatch.NumberOfPlayers} players... continuing");
         }
     }
 

@@ -128,7 +128,7 @@ MonoBehaviour:
     m_StyleName: bold
     m_PointSize: 45
     m_Scale: 1
-    m_UnitsPerEM: 1000
+    m_UnitsPerEM: 0
     m_LineHeight: 66.825005
     m_AscentLine: 48.375
     m_CapLine: 33
@@ -144,8 +144,53 @@ MonoBehaviour:
     m_StrikethroughOffset: 9.6
     m_StrikethroughThickness: 2.25
     m_TabWidth: 14
-  m_Material: {fileID: -4054985965322405587}
-  m_SourceFontFileGUID: d22d91c285ac82849bc2563a6707d20b
+  m_GlyphTable: []
+  m_CharacterTable: []
+  m_AtlasTextures:
+  - {fileID: 7858535117429185323}
+  m_AtlasTextureIndex: 0
+  m_IsMultiAtlasTexturesEnabled: 0
+  m_ClearDynamicDataOnBuild: 1
+  m_UsedGlyphRects: []
+  m_FreeGlyphRects:
+  - m_X: 0
+    m_Y: 0
+    m_Width: 1023
+    m_Height: 1023
+  m_fontInfo:
+    Name: 
+    PointSize: 0
+    Scale: 0
+    CharacterCount: 0
+    LineHeight: 0
+    Baseline: 0
+    Ascender: 0
+    CapHeight: 0
+    Descender: 0
+    CenterLine: 0
+    SuperscriptOffset: 0
+    SubscriptOffset: 0
+    SubSize: 0
+    Underline: 0
+    UnderlineThickness: 0
+    strikethrough: 0
+    strikethroughThickness: 0
+    TabWidth: 0
+    Padding: 0
+    AtlasWidth: 0
+    AtlasHeight: 0
+  atlas: {fileID: 0}
+  m_AtlasWidth: 1024
+  m_AtlasHeight: 1024
+  m_AtlasPadding: 4
+  m_AtlasRenderMode: 4165
+  m_glyphInfoList: []
+  m_KerningTable:
+    kerningPairs: []
+  m_FontFeatureTable:
+    m_GlyphPairAdjustmentRecords: []
+  fallbackFontAssets: []
+  m_FallbackFontAssetTable: []
   m_CreationSettings:
     sourceFontFileName: 
     sourceFontFileGUID: d22d91c285ac82849bc2563a6707d20b
@@ -6531,10 +6576,10 @@ Texture2D:
     serializedVersion: 2
     Hash: 00000000000000000000000000000000
   m_IsAlphaChannelOptional: 0
-  serializedVersion: 3
-  m_Width: 1
-  m_Height: 1
-  m_CompleteImageSize: 1
+  serializedVersion: 2
+  m_Width: 0
+  m_Height: 0
+  m_CompleteImageSize: 0
   m_MipsStripped: 0
   m_TextureFormat: 1
   m_MipCount: 1
@@ -6559,8 +6604,8 @@ Texture2D:
   m_LightmapFormat: 0
   m_ColorSpace: 0
   m_PlatformBlob: 
-  image data: 1
-  _typelessdata: 00
+  image data: 0
+  _typelessdata: 
   m_StreamData:
     serializedVersion: 2
     offset: 0
