@@ -56,12 +56,11 @@ public class NetworkMove : NetworkBehaviour
     [Command]
     void CmdShoot(Vector2 pos, Quaternion rotation)
     {
-        var pvpNetworkManager = FindFirstObjectByType<PvPNetworkManager>();
-        if (pvpNetworkManager == null) return;
+        var netManager = FindFirstObjectByType<PvPNetworkManager>();
+        if (netManager == null) return; // TODO: Error handling!
 
         GameObject bullet = Instantiate(prefabBullet, pos, rotation);
         NetworkServer.Spawn(bullet);
-        pvpNetworkManager.MoveToScene(connectionToClient, bullet);
         bullet.GetComponent<Owner>().owner = netId;
         Debug.Log("BulletNetID is " + bullet.GetComponent<Owner>().owner);
         netManager.MoveToScene(connectionToClient, bullet);
@@ -71,7 +70,7 @@ public class NetworkMove : NetworkBehaviour
     {
         float horizontalInput = Input.GetAxis("Horizontal");
         float verticalInput = Input.GetAxis("Vertical");
-        
+
         Vector3 movement = new Vector3(horizontalInput, verticalInput, 0) * speed * Time.deltaTime;
         transform.Translate(movement);
     }

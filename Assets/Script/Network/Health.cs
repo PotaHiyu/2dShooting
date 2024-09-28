@@ -30,14 +30,6 @@ public class Health : NetworkBehaviour
         Debug.Log($"HealthHandler {isClient} {isServer} {isLocalPlayer} {authority}");
         if (health == 0 && isClient)
         {
-            StartCoroutine(DestroyAction());
-        }
-    }
-
-    void HealthHandler (int oldHealth, int newHealth)
-    {
-        if (health == 0 && isClient)
-        {
             if (isLocalPlayer)
             {
                 StartCoroutine(DestroyAction());
@@ -48,23 +40,34 @@ public class Health : NetworkBehaviour
 
     public void OnPlayerDied()
     {
-        if (deathVFX && isClient) SpawnVFX();
+        if (deathVFX && isClient) CmdSpawnVFX();
         var renderer = GetComponent<SpriteRenderer>();
         if (renderer != null) renderer.enabled = false;
     }
 
     IEnumerator DestroyAction()
     {
+        Debug.Log($"DestroyAction {isClient} {isServer} {isLocalPlayer} {authority}");
         if (isLocalPlayer)
         {
             yield return new WaitForSeconds(deathTime);
+            // player will disconnect
+            Debug.Log("Disconnecting!");
             connectionToServer.Disconnect();
+            // Destroy(gameObject);
         }
-        
     }
 
-    void SpawnVFX()
+    // [Command]
+    void CmdSpawnVFX()
     {
-        Instantiate(deathVFX, transform.position, Quaternion.identity);
+        // var pvpNetworkManager = FindFirstObjectByType<PvPNetworkManager>();
+        // Debug.Log("Spawning vfx");
+        // Debug.Log(pvpNetworkManager);
+        // if (pvpNetworkManager == null) return;
+
+        GameObject vfx = Instantiate(deathVFX, transform.position, Quaternion.identity);
+        // NetworkServer.Spawn(vfx);
+        // pvpNetworkManager.MoveToScene(connectionToClient, vfx);
     }
 }
