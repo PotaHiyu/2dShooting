@@ -26,7 +26,7 @@ public class PlayerSkill : NetworkBehaviour
             var pvpNetworkManager = FindFirstObjectByType<PvPNetworkManager>();
             if (pvpNetworkManager == null) return;
 
-            GameObject go = Instantiate(prefab, pos, Quaternion.identity);
+            GameObject go = Instantiate(prefab, new Vector3(pos.x, pos.y, -1), Quaternion.identity);
             NetworkServer.Spawn(go);
             pvpNetworkManager.MoveToScene(connectionToClient, go);
             go.GetComponent<Owner>().owner = netId;

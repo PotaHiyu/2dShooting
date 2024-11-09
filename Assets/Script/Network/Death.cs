@@ -8,6 +8,7 @@ public class Death : NetworkBehaviour
 {
     public GameObject deathVFX;
     public float deathTime = 2f;
+    public bool isPlayer = false;
     
     void Start()
     {
@@ -24,8 +25,14 @@ public class Death : NetworkBehaviour
     IEnumerator DeathAnimation()
     {   
         if (deathVFX) SpawnVFX();
-        var renderer = GetComponent<SpriteRenderer>();
-        if (renderer != null) renderer.enabled = false;
+        if (isPlayer) {
+            Renderer renderer = GetComponent<SpriteRenderer>();
+            if (renderer != null) renderer.enabled = false;
+        }
+        else if (!isPlayer)
+        {
+            gameObject.SetActive(false);
+        }
         yield return new WaitForSeconds(deathTime);
     }
 
