@@ -11,6 +11,7 @@ public class Death : NetworkBehaviour
     public float zoomTime = 2f;
     public GameObject deathVFX;
     public float deathTime = 2f;
+    float deathTimeElapsed = 0f;
 
     void Start()
     {
@@ -43,8 +44,14 @@ public class Death : NetworkBehaviour
 
         yield return new WaitForSeconds(deathTime);
 
-        Debug.Log("Disconnecting!");
-        // connectionToServer.Disconnect();
-        SceneManager.LoadScene("Title");
+        Debug.Log($"Disconnecting! {isClient} {isServer} {isLocalPlayer} {connectionToServer}");
+        connectionToServer?.Disconnect();
+        // SceneManager.LoadScene("Title", LoadSceneMode.Additive);
+    }
+
+    override public void OnStopClient()
+    {
+        Debug.Log("got stop message");
+        SceneManager.LoadScene("Title", LoadSceneMode.Additive);
     }
 }
