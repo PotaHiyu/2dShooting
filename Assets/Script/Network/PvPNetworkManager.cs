@@ -229,6 +229,20 @@ public class PvPNetworkManager : NetworkManager
     public override void OnServerDisconnect(NetworkConnectionToClient conn)
     {
         base.OnServerDisconnect(conn);
+        int id = conn.connectionId;
+        if (!clientMatches.ContainsKey(id)) return;
+        Match match = clientMatches[id];
+        clientMatches.Remove(id);
+        if (match.RemovePlayer())
+        {
+            StartCoroutine(UnloadScene(match.GameScene));
+        }
+    }
+
+    IEnumerator UnloadScene(Scene scene)
+    {
+        if (scene.IsValid()) yield return SceneManager.UnloadSceneAsync(scene);
+        yield return Resources.UnloadUnusedAssets();
     }
 
     /// <summary>
@@ -325,7 +339,17 @@ public class PvPNetworkManager : NetworkManager
     /// <summary>
     /// This is called when a client is stopped.
     /// </summary>
-    public override void OnStopClient() { }
+    public override void OnStopClient() {
+        if (mode == NetworkManagerMode.Offline)
+            StartCoroutine(ClientUnloadSubScenes());
+    }
+
+    IEnumerator ClientUnloadSubScenes()
+    {
+        for (int index = 0; index < SceneManager.sceneCount; index++)
+            if (SceneManager.GetSceneAt(index) != SceneManager.GetActiveScene())
+                yield return SceneManager.UnloadSceneAsync(SceneManager.GetSceneAt(index));
+    }
 
     #endregion
 }

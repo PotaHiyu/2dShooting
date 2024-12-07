@@ -3,18 +3,21 @@ using System.Collections.Generic;
 using UnityEngine;
 using Mirror;
 using UnityEngine.Events;
+using UnityEngine.SceneManagement;
 
 public class Death : NetworkBehaviour
 {
+    public GameObject zoomCamera;
     public GameObject deathVFX;
     public float deathTime = 2f;
-    public bool isPlayer = false;
+    public float zoomTime = 2f;
     
     void Start()
     {
         Health health = GetComponent<Health>();
         if (health == null) return;
         health.onPlayerDied += OnPlayerDied;
+        if (zoomCamera == null) zoomCamera = GameObject.FindWithTag("MainCamera");
     }
 
     public void OnPlayerDied()
@@ -24,21 +27,27 @@ public class Death : NetworkBehaviour
 
     IEnumerator DeathAnimation()
     {   
-        if (deathVFX) SpawnVFX();
-        if (isPlayer) {
-            Renderer renderer = GetComponent<SpriteRenderer>();
-            if (renderer != null) renderer.enabled = false;
-        }
-        else if (!isPlayer)
+        if (!isClient) yield break;
+
+        var endTime = Time.time + zoomTime;
+        Vector3 goal = transform.position + new Vector3(0, 0, -5);
+        while (zoomCamera != null && Time.time < endTime)
         {
-            gameObject.SetActive(false);
+            zoomCamera.transform.position = Vector3.Lerp(zoomCamera.transform.position, goal, 0.025f);
+            yield return null;
         }
+
+        if (deathVFX) Instantiate(deathVFX, transform.position, Quaternion.identity);
+        SpriteRenderer renderer = GetComponent<SpriteRenderer>();
+        if (renderer != null) renderer.enabled = false;
+
         yield return new WaitForSeconds(deathTime);
+
+        connectionToServer?.Disconnect();
     }
 
-
-    void SpawnVFX()
+    override public void OnStopClient()
     {
-        Instantiate(deathVFX, transform.position, Quaternion.identity);
+        SceneManager.LoadScene("Title", LoadSceneMode.Additive);
     }
 }
