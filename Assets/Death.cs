@@ -26,15 +26,30 @@ public class Death : NetworkBehaviour
         if (isClient) StartCoroutine(DeathAnimation());
     }
 
+    public static float Ease(float t)
+    {
+        if (t < 0.5f) return 8f * t * t * t * t;
+        var x = -2 * t + 2;
+        return 1 - x * x * x * x / 2;
+    }
+
     IEnumerator DeathAnimation()
     {
         if (!isClient) yield break;
 
         var endTime = Time.time + zoomTime;
-        Vector3 goal = transform.position + new Vector3(0, 0, -5);
+        Vector3 goal = transform.position;
+        goal.z = zoomCamera.transform.position.z;
+        var camera = zoomCamera.GetComponent<Camera>();
+        var startSize = camera.orthographicSize;
         while (zoomCamera != null && Time.time < endTime)
         {
-            zoomCamera.transform.position = Vector3.Lerp(zoomCamera.transform.position, goal, 0.025f);
+            // Change the number to change the movement speed.
+            zoomCamera.transform.position = Vector3.Lerp(zoomCamera.transform.position, goal, 0.005f);
+            // Change the number to change the zoom start. 1 starts immediately; larger numbers delay the start.
+            var zoomProgress = endTime == Time.time ? 1 : Mathf.Clamp01(1 - 1.3f * (endTime - Time.time) / zoomTime);
+            // Change the number to change the zoom amount. Smaller numbers zoom in more.
+            camera.orthographicSize = Mathf.Lerp(startSize, 3, Ease(zoomProgress));
             yield return null;
         }
 
