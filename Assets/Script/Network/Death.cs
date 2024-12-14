@@ -30,10 +30,12 @@ public class Death : NetworkBehaviour
         if (!isClient) yield break;
 
         var endTime = Time.time + zoomTime;
-        Vector3 goal = transform.position + new Vector3(0, 0, -5);
+        var zoomProgress = endTime - Time.time == zoomTime ? 0 : (((zoomTime - (endTime - Time.time)) / 2) + (zoomTime / 2)) / zoomTime;
+        Vector3 goal = transform.position;
         while (zoomCamera != null && Time.time < endTime)
         {
             zoomCamera.transform.position = Vector3.Lerp(zoomCamera.transform.position, goal, 0.025f);
+            zoomCamera.GetComponent<Camera>().orthographicSize = Mathf.Lerp(5, 3, zoomProgress);
             yield return null;
         }
 
