@@ -10,6 +10,11 @@ public class AutoConnect : MonoBehaviour
     {
         manager = GetComponent<NetworkManager>();
         manager.networkAddress = "127.0.0.1"; // TODO: Make a way to look up the server address.
+
+        // Don't automatically connect if we're the server.
+        if (DataManager.instance.isServer)
+            return;
+
         manager.StartClient();
         StartCoroutine(MakePlayer());
     }
