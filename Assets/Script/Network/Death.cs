@@ -59,15 +59,16 @@ public class Death : NetworkBehaviour
 
         yield return new WaitForSeconds(deathTime);
 
+        // Trigger load before disconnecting.
+        SceneManager.LoadScene("Title");
         Debug.Log($"Disconnecting! {isClient} {isServer} {isLocalPlayer} {connectionToServer}");
-        connectionToServer?.Disconnect();
-        // SceneManager.LoadScene("Title", LoadSceneMode.Additive);
+        NetworkManager.singleton.StopClient();
     }
 
     override public void OnStopClient()
     {
         Debug.Log("got stop message");
         SceneManager.LoadScene("Title");
-        Destroy(NetworkManager.singleton.gameObject);
+        NetworkManager.singleton.StopClient();
     }
 }
