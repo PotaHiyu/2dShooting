@@ -23,10 +23,4 @@ public class ChooseMode : MonoBehaviour
     {
         SceneManager.LoadScene("Online");
     }
-
-    public void OnClickServerButton()
-    {
-        DataManager.instance.isServer = true;
-        SceneManager.LoadScene("Online");
-    }
 }

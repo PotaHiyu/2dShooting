@@ -68,7 +68,6 @@ public class Death : NetworkBehaviour
     {
         Debug.Log("got stop message");
         SceneManager.LoadScene("Title");
-        var manager = NetworkManager.singleton;
-        Destroy(manager.gameObject);
+        Destroy(NetworkManager.singleton.gameObject);
     }
 }

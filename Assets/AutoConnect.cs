@@ -12,7 +12,7 @@ public class AutoConnect : MonoBehaviour
         manager.networkAddress = "127.0.0.1"; // TODO: Make a way to look up the server address.
 
         // Don't automatically connect if we're the server.
-        if (DataManager.instance.isServer)
+        if (Application.isBatchMode)
             return;
 
         manager.StartClient();
