@@ -7,6 +7,7 @@ public class PlayerSkill : NetworkBehaviour
 {
     public GameObject prefab;
     public Transform skillPosition;
+    private int shootType;
     [SyncVar]
     private float count = 1;
 
@@ -15,6 +16,10 @@ public class PlayerSkill : NetworkBehaviour
         if (Input.GetKeyDown(KeyCode.C))
         {
             CmdSpawnSkill(skillPosition.position);
+        }
+        if (Input.GetKeyDown(KeyCode.V))
+        {
+            CmdChangeShootType();
         }
     }
 
@@ -31,6 +36,23 @@ public class PlayerSkill : NetworkBehaviour
             pvpNetworkManager.MoveToScene(connectionToClient, go);
             go.GetComponent<Owner>().owner = netId;
             count -= 1;
+        }
+    }
+
+    [Command]
+    void CmdChangeShootType()
+    {
+        if (shootType == 0)
+        {
+
+        }
+        else if (shootType == 1)
+        {
+
+        }
+        else
+        {
+
         }
     }
 }

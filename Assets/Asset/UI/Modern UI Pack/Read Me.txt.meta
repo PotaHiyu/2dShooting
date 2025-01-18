@@ -6,3 +6,10 @@ TextScriptImporter:
   userData: 
   assetBundleName: 
   assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 201717
+  packageName: Modern UI Pack
+  packageVersion: 
+  assetPath: Assets/Asset/UI/Modern UI Pack/Read Me.txt
+  uploadId: 0

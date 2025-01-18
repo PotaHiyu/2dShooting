@@ -25,15 +25,28 @@ public class Death : NetworkBehaviour
         if (isClient) StartCoroutine(DeathAnimation());
     }
 
+    public static float Ease(float t)
+    {
+        if(t < 0.5f) 
+        return 8f * t * t * t * t;
+        var x = -2 * t + 2;
+        return 1 - x * x * x * x / 2;
+    }
+
     IEnumerator DeathAnimation()
-    {   
+    {
         if (!isClient) yield break;
 
         var endTime = Time.time + zoomTime;
-        Vector3 goal = transform.position + new Vector3(0, 0, -5);
+        Vector3 goal = transform.position;
+        goal.z = zoomCamera.transform.position.z;
+        var camera = zoomCamera.GetComponent<Camera>();
+        var startSize = camera.orthographicSize;
         while (zoomCamera != null && Time.time < endTime)
         {
-            zoomCamera.transform.position = Vector3.Lerp(zoomCamera.transform.position, goal, 0.025f);
+            zoomCamera.transform.position = Vector3.Lerp(zoomCamera.transform.position, goal, 0.005f);
+            var zoomProgress = endTime == Time.time ? 1 : Mathf.Clamp01(1 - 1.3f * (endTime - Time.time) / zoomTime);
+            camera.orthographicSize = Mathf.Lerp(startSize, 3, Ease(zoomProgress));
             yield return null;
         }
 
@@ -43,11 +56,13 @@ public class Death : NetworkBehaviour
 
         yield return new WaitForSeconds(deathTime);
 
-        connectionToServer?.Disconnect();
+        connectionToServer?.Disconnect(); // NetworkManagerのスクリプト確認。Disconnect以外でなにか、、
     }
 
     override public void OnStopClient()
     {
-        SceneManager.LoadScene("Title", LoadSceneMode.Additive);
+        SceneManager.LoadScene("Finish");
+        var manager = NetworkManager.singleton;
+        Destroy(manager.gameObject);
     }
 }

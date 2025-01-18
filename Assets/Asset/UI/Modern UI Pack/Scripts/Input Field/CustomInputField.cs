@@ -15,14 +15,16 @@ namespace Michsky.MUIP
     {
         [Header("Resources")]
         public TMP_InputField inputText;
-        public Animator inputFieldAnimator;
+        [SerializeField] private Animator inputFieldAnimator;
 
         [Header("Settings")]
         public bool processSubmit = false;
         public bool clearOnSubmit = true;
+        [Tooltip("Set the current event system object as null.")]
+        [SerializeField] private bool setEventSystem = false;
 
         [Header("Events")]
-        public UnityEvent onSubmit;
+        public UnityEvent onSubmit = new UnityEvent();
 
         // Hidden variables
         private float cachedDuration = 0.5f;
@@ -34,8 +36,7 @@ namespace Michsky.MUIP
 
         void Awake()
         {
-            if (inputText == null) { inputText = gameObject.GetComponent<TMP_InputField>(); }
-            if (inputFieldAnimator == null) { inputFieldAnimator = gameObject.GetComponent<Animator>(); }
+            Initialize();
 
             inputText.onSelect.AddListener(delegate { AnimateIn(); });
             inputText.onEndEdit.AddListener(delegate { HandleEndEdit(); });
@@ -46,26 +47,22 @@ namespace Michsky.MUIP
 
         void OnEnable()
         {
-            if (inputText == null) { return; }
-            if (gameObject.activeInHierarchy == true) { StartCoroutine("DisableAnimator"); }
-
+            if (inputText == null || inputFieldAnimator == null) { Initialize(); }
             inputText.ForceLabelUpdate();
             UpdateStateInstant();
         }
 
         void Update()
         {
-            if (processSubmit == false ||
-                string.IsNullOrEmpty(inputText.text) == true ||
-                EventSystem.current.currentSelectedGameObject != inputText.gameObject)
-            { return; }
+            if (!processSubmit || string.IsNullOrEmpty(inputText.text) || EventSystem.current.currentSelectedGameObject != inputText.gameObject)
+                return;
 
 #if ENABLE_LEGACY_INPUT_MANAGER
             if (Input.GetKeyDown(KeyCode.Return)) 
             { 
                 onSubmit.Invoke();
 
-                if (clearOnSubmit == true) 
+                if (clearOnSubmit) 
                 {
                     inputText.text = ""; 
                     UpdateState();
@@ -76,7 +73,7 @@ namespace Michsky.MUIP
             { 
                 onSubmit.Invoke(); 
                 
-                if (clearOnSubmit == true) 
+                if (clearOnSubmit) 
                 { 
                     inputText.text = ""; 
                     UpdateState();
@@ -85,9 +82,15 @@ namespace Michsky.MUIP
 #endif
         }
 
+        void Initialize()
+        {
+            if (inputText == null) { inputText = gameObject.GetComponent<TMP_InputField>(); }
+            if (inputFieldAnimator == null) { inputFieldAnimator = gameObject.GetComponent<Animator>(); }
+        }
+
         public void AnimateIn() 
         {
-            if (inputFieldAnimator.gameObject.activeInHierarchy == true && isActive != true) 
+            if (inputFieldAnimator.gameObject.activeInHierarchy && !isActive) 
             {
                 StopCoroutine("DisableAnimator");
                 StartCoroutine("DisableAnimator");
@@ -100,7 +103,7 @@ namespace Michsky.MUIP
 
         public void AnimateOut()
         {
-            if (inputFieldAnimator.gameObject.activeInHierarchy == true && inputText.text.Length == 0 && isActive != false)
+            if (inputFieldAnimator.gameObject.activeInHierarchy && inputText.text.Length == 0 && isActive)
             {
                 StopCoroutine("DisableAnimator");
                 StartCoroutine("DisableAnimator");
@@ -130,7 +133,7 @@ namespace Michsky.MUIP
 
         void HandleEndEdit()
         {
-            if (string.IsNullOrEmpty(inputText.text) && !EventSystem.current.alreadySelecting && EventSystem.current.currentSelectedGameObject == inputText.gameObject)
+            if (setEventSystem && string.IsNullOrEmpty(inputText.text) && !EventSystem.current.alreadySelecting && EventSystem.current.currentSelectedGameObject == inputText.gameObject)
             {
                 EventSystem.current.SetSelectedGameObject(null);
             }
