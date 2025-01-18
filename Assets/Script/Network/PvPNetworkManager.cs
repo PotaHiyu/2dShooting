@@ -11,11 +11,13 @@ public class Match
     {
         GameScene = scene;
         MaxPlayers = maxPlayers;
+        players = new NetworkConnectionToClient[maxPlayers];
         NumberOfPlayers = 0;
     }
 
-    public bool AddPlayer()
+    public bool AddPlayer(NetworkConnectionToClient conn)
     {
+        players[NumberOfPlayers] = conn;
         NumberOfPlayers++;
         Debug.Log($"Added: Match now has {NumberOfPlayers} / {MaxPlayers} players...");
         return IsFull;
@@ -26,13 +28,7 @@ public class Match
     public bool IsFull => NumberOfPlayers >= MaxPlayers;
     public int MaxPlayers { get; }
     public int NumberOfPlayers { get; private set; }
-
-    public bool RemovePlayer()
-    {
-        NumberOfPlayers--;
-        Debug.Log($"Removed: Match now has {NumberOfPlayers} / {MaxPlayers} players...");
-        return IsEmpty;
-    }
+    protected NetworkConnectionToClient[] players;
 }
 
 /*
@@ -42,8 +38,6 @@ public class Match
 
 public class PvPNetworkManager : NetworkManager
 {
-    public Transform leftPlayerStart;
-    public Transform rightPlayerStart;
     // Overrides the base singleton so we don't
     // have to cast to this type everywhere.
     public static new PvPNetworkManager singleton => (PvPNetworkManager)NetworkManager.singleton;
@@ -201,11 +195,10 @@ public class PvPNetworkManager : NetworkManager
         yield return new WaitForEndOfFrame();
         base.OnServerAddPlayer(conn);
 
-        SceneManager.MoveGameObjectToScene(conn.identity.gameObject,
-            currentMatch.GameScene);
+        SceneManager.MoveGameObjectToScene(conn.identity.gameObject, currentMatch.GameScene);
         clientMatches.Add(conn.connectionId, currentMatch);
 
-        if (currentMatch.AddPlayer())
+        if (currentMatch.AddPlayer(conn))
         {
             currentMatch = null;
             StartCoroutine(ServerLoadSubScene());
