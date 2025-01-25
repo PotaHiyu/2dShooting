@@ -4,14 +4,13 @@ using UnityEngine;
 
 public class Countdown : MonoBehaviour
 {
-    public int countdownTime = 3;
     private int currentTime = 0;
     protected TextMeshProUGUI text;
 
     void OnEnable()
     {
         text = GetComponent<TextMeshProUGUI>();
-        currentTime = countdownTime;
+        currentTime = OnlineGameManager.instance.countdownTime;
         if (text != null) StartCoroutine(StartCount());
     }
 
@@ -23,6 +22,5 @@ public class Countdown : MonoBehaviour
             yield return new WaitForSeconds(1f);
             currentTime--;
         }
-        OnlineGameManager.instance.StartPlaying();
     }
 }

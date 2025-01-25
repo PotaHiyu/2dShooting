@@ -28,7 +28,7 @@ public class Match
     public bool IsFull => NumberOfPlayers >= MaxPlayers;
     public int MaxPlayers { get; }
     public int NumberOfPlayers { get; private set; }
-    protected NetworkConnectionToClient[] players;
+    public NetworkConnectionToClient[] players;
 }
 
 /*
@@ -47,7 +47,7 @@ public class PvPNetworkManager : NetworkManager
     private Match currentMatch = null;
     private bool matchReady => currentMatch != null;
     private Dictionary<int, Match> clientMatches = new Dictionary<int, Match>();
-
+    public int matchCountdown = 3;
 
     /// <summary>
     /// Runs on both Server and Client
@@ -190,8 +190,12 @@ public class PvPNetworkManager : NetworkManager
     IEnumerator OnServerAddPlayerDelayed(NetworkConnectionToClient conn)
     {
         while (!matchReady) yield return null;
-        conn.Send(new SceneMessage { sceneName = gameScene, sceneOperation =
-            SceneOperation.LoadAdditive });
+        conn.Send(new SceneMessage
+        {
+            sceneName = gameScene,
+            sceneOperation =
+            SceneOperation.LoadAdditive
+        });
         yield return new WaitForEndOfFrame();
         base.OnServerAddPlayer(conn);
 
@@ -200,8 +204,21 @@ public class PvPNetworkManager : NetworkManager
 
         if (currentMatch.AddPlayer(conn))
         {
+            Match thisMatch = currentMatch;
             currentMatch = null;
             StartCoroutine(ServerLoadSubScene());
+
+            foreach (NetworkConnectionToClient player in thisMatch.players)
+            {
+                GameStart gs = player.identity.GetComponent<GameStart>();
+                if (gs != null) gs.RpcStartCountdown(matchCountdown);
+            }
+            yield return new WaitForSeconds(matchCountdown);
+            foreach (NetworkConnectionToClient player in thisMatch.players)
+            {
+                GameStart gs = player.identity.GetComponent<GameStart>();
+                if (gs != null) gs.RpcStartPlaying();
+            }
         }
     }
 

@@ -1,5 +1,3 @@
-using System.Collections.Generic;
-using UnityEngine;
 using Mirror;
 using UnityEngine.Events;
 
@@ -27,13 +25,15 @@ public class OnlineGameManager : NetworkBehaviour
         {
             return gameState_;
         }
-        private set
+        protected set
         {
             gameState_ = value;
             onGameStateChanged?.Invoke(gameState_);
         }
     }
     public UnityAction<GameState> onGameStateChanged;
+    public int countdownTime = 3;
+
     #region Unity Callbacks
 
     /// <summary>
@@ -56,6 +56,12 @@ public class OnlineGameManager : NetworkBehaviour
     }
 
     #endregion
+
+    public void StartCountdown(int time)
+    {
+        countdownTime = time;
+        gameState = GameState.Countdown;
+    }
 
     public void StartPlaying()
     {
