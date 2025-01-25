@@ -1,17 +1,13 @@
+using Mirror;
 using UnityEngine;
 
-public enum BulletMoveType
-{
-    Straight,
-    Curve
-}
-
-public class BalletMove : MonoBehaviour
+public class OnlineBulletMove : NetworkBehaviour
 {
     public bool isPlayer;
     public float speed;
     private float rand;
     private Destroy destroyScript;
+    [SyncVar]
     public BulletMoveType bulletMoveType = BulletMoveType.Straight;
 
     void Start()

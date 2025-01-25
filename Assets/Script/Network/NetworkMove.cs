@@ -18,6 +18,7 @@ public class NetworkMove : NetworkBehaviour
     public bool useLimitMode = false;
     private int showCount = 5;
     public TextMeshProUGUI showCountText;
+    private BulletMoveType bulletMoveType = BulletMoveType.Straight;
 
     private void Start()
     {
@@ -30,9 +31,12 @@ public class NetworkMove : NetworkBehaviour
 
     void Update()
     {
+        if (isLocalPlayer && Input.GetKeyDown(KeyCode.V)) {
+            bulletMoveType = BalletMove.NextBulletMoveType(bulletMoveType);
+        }
         if (isLocalPlayer && Input.GetKey(KeyCode.Space) && timer <= 0.0f && !limitMode)
         {
-            CmdShoot(bulletSpawnPoint.position, transform.rotation);
+            CmdShoot(bulletSpawnPoint.position, transform.rotation, bulletMoveType);
             timer = interval;
             if (showCount > 0 && useLimitMode)
             {
@@ -54,7 +58,7 @@ public class NetworkMove : NetworkBehaviour
     }
 
     [Command]
-    void CmdShoot(Vector2 pos, Quaternion rotation)
+    void CmdShoot(Vector2 pos, Quaternion rotation, BulletMoveType bulletMoveType)
     {
         var pvpNetworkManager = FindFirstObjectByType<PvPNetworkManager>();
         if (pvpNetworkManager == null) return;
@@ -63,6 +67,7 @@ public class NetworkMove : NetworkBehaviour
         NetworkServer.Spawn(bullet);
         pvpNetworkManager.MoveToScene(connectionToClient, bullet);
         bullet.GetComponent<Owner>().owner = netId;
+        bullet.GetComponent<OnlineBulletMove>().bulletMoveType = bulletMoveType;
         Debug.Log("BulletNetID is " + bullet.GetComponent<Owner>().owner);
     }
 
@@ -70,7 +75,7 @@ public class NetworkMove : NetworkBehaviour
     {
         float horizontalInput = Input.GetAxis("Horizontal");
         float verticalInput = Input.GetAxis("Vertical");
-        
+
         Vector3 movement = new Vector3(horizontalInput, verticalInput, 0) * speed * Time.deltaTime;
         transform.Translate(movement);
     }
