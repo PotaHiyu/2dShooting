@@ -23,6 +23,7 @@ public class EnemyManager : MonoBehaviour
         gameManager = GameObject.FindGameObjectWithTag("GameController").GetComponent<GameManager>();
         destroyScript = GetComponent<Destroy>();
         pos = transform.position;
+        health += gameManager.enemyHpBonus;
     }
 
     void Update()
@@ -55,13 +56,9 @@ public class EnemyManager : MonoBehaviour
             health--;
             if (health == 0)
             {
+                gameManager.score += score;
                 destroyScript.Destroying();
             }
-        }
-
-        if (isGoal)
-        {
-            gameManager.isWin = true;
         }
     }
 }

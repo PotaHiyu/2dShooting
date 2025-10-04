@@ -1,0 +1,23 @@
+using UnityEngine;
+
+public class GameStateUIManager : MonoBehaviour
+{
+    public GameObject waitingUI;
+    public GameObject countdownUI;
+    public GameObject playingUI;
+    public GameObject gameOverUI;
+
+    void Start()
+    {
+        OnlineGameManager.instance.onGameStateChanged += ShowState;
+        ShowState(OnlineGameManager.instance.gameState);
+    }
+
+    void ShowState(GameState state)
+    {
+        if (waitingUI != null) waitingUI.SetActive(state == GameState.WaitingForPlayers);
+        if (countdownUI != null) countdownUI.SetActive(state == GameState.Countdown);
+        if (playingUI != null) playingUI.SetActive(state == GameState.Playing);
+        if (gameOverUI != null) gameOverUI.SetActive(state == GameState.GameOver);
+    }
+}

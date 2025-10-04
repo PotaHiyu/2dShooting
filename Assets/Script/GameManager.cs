@@ -2,15 +2,20 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.SceneManagement;
-//using TMPro;
+using TMPro;
 
 [System.Serializable]
 public class SpawnInfo
 {
     public GameObject objectToSpawn;
-    public float xPosition;
-    public float yPosition;
+    public Vector2 position;
     public float spawnDelay;
+}
+
+[System.Serializable]
+public class SpawnPattern
+{
+    public List<SpawnInfo> spawns = new List<SpawnInfo>();
 }
 
 public class GameManager : MonoBehaviour
@@ -20,40 +25,91 @@ public class GameManager : MonoBehaviour
     public float score = 0f;
     public GameObject clearText;
     public GameObject bulletIcon;
-    public List<SpawnInfo> spawnInfos;
+    public List<SpawnPattern> patterns = new List<SpawnPattern>();
+    public float patternInterval = 3f;
+    public float speedMultiplier = 1f;
+    public float intervalMultiplier = 1f;
+    public float speedIncreasePerScore = 0.01f;
+    public float intervalDecreasePerScore = 0.01f;
+    public int enemyHpBonus = 0;
+    public string gameOverSceneName = "Finish";
     private bool gameMode = ChooseMode.mode;
+    public TextMeshProUGUI scoreText;
+    private TextMeshProUGUI scoreTextCom;
+    private DontDestroyOnLoad dontDestroyObj;
 
     void Start()
     {
         score = 0f;
-        foreach (var info in spawnInfos)
-        {
-            StartCoroutine(SpawnAfterDelay(info));
-        }
-        if (gameMode == true)
-        {
+        if (gameMode)
             bulletIcon.SetActive(true);
-        }
+
+        StartCoroutine(SpawnLoop());
+        isLose = false;
+        isWin = false;
+        scoreTextCom = clearText.GetComponent<TextMeshProUGUI>();
+        dontDestroyObj = GameObject.Find("DontDestroyOnLoad").GetComponent<DontDestroyOnLoad>();
     }
 
     void Update()
     {
+        if (!isWin && !isLose)
+        {
+            score += Time.deltaTime;
+        }
+        speedMultiplier += speedIncreasePerScore * Time.deltaTime;
+        intervalMultiplier += intervalDecreasePerScore * Time.deltaTime;
+
+        enemyHpBonus = Mathf.FloorToInt(score / 100f);
+
         if (isWin)
         {
             clearText.SetActive(true);
             StartCoroutine(GameClear());
         }
-
         if (isLose)
         {
+            clearText.SetActive(true);
+            scoreTextCom.text = "GAME OVER?\n\nYour score\n" + Mathf.FloorToInt(score).ToString();
             StartCoroutine(GameOver());
         }
+
+        scoreText.text = Mathf.FloorToInt(score).ToString();
     }
 
-    IEnumerator SpawnAfterDelay(SpawnInfo info)
+    IEnumerator SpawnLoop()
     {
-        yield return new WaitForSeconds(info.spawnDelay);
-        Instantiate(info.objectToSpawn, new Vector2(info.xPosition, info.yPosition), info.objectToSpawn.transform.rotation);
+        while(!isLose && !isWin)
+        {
+            if (patterns.Count == 0)
+                yield break;
+
+            int index = Random.Range(0, patterns.Count);
+            SpawnPattern pattern = patterns[index];
+
+            foreach (var spawnInfo in pattern.spawns)
+            {
+                yield return new WaitForSeconds(spawnInfo.spawnDelay);
+
+                GameObject obj = Instantiate(
+                    spawnInfo.objectToSpawn,
+                    spawnInfo.position,
+                    spawnInfo.objectToSpawn.transform.rotation
+                );
+
+                EnemyMove enemyMove = obj.GetComponent<EnemyMove>();
+                if (enemyMove != null)
+                {
+                    enemyMove.moveSpeed *= speedMultiplier;
+                }
+            }
+
+            float adjustedInterval = patternInterval / intervalMultiplier;
+            yield return new WaitForSeconds(adjustedInterval);
+
+            // speedMultiplier += speedIncreasePerScore * score;
+            // intervalMultiplier += intervalDecreasePerScore * score;
+        }
     }
 
     IEnumerator GameClear()
@@ -64,7 +120,9 @@ public class GameManager : MonoBehaviour
 
     IEnumerator GameOver()
     {
+        Debug.Log("GAME OVER");
+        dontDestroyObj.score = score;
         yield return new WaitForSeconds(3f);
-        SceneManager.LoadScene("Title");
+        SceneManager.LoadScene(gameOverSceneName);
     }
 }

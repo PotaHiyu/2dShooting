@@ -15,9 +15,9 @@ public class Move : MonoBehaviour
     private int count = 0;
     private bool limitMode = false;
     public bool useLimitMode = false;
+    public bool debugMode = true;
     private int showCount = 5;
     public TextMeshProUGUI showCountText;
-
     private void Start()
     {
         useLimitMode = ChooseMode.mode;
@@ -32,7 +32,13 @@ public class Move : MonoBehaviour
         pos = gameObject.transform.position;
         pos.x += 1f;
 
-        if (Input.GetKey(KeyCode.Space) && timer <= 0.0f && !limitMode)
+        if (debugMode && timer <= 0.0f)
+        {
+            Instantiate(prefabBullet, pos, Quaternion.identity);
+            timer = interval;
+        }
+
+        if (!debugMode && Input.GetKey(KeyCode.Space) && timer <= 0.0f && !limitMode)
         {
             Instantiate(prefabBullet, pos, Quaternion.identity);
             timer = interval;

@@ -18,7 +18,7 @@ public class PlayerManager : MonoBehaviour
         if (collision.gameObject.CompareTag("Enemy"))
         {
             health--;
-            if (health == 0)
+            if (health <= 0)
             {
                 destroyScript.Destroying();
             }
@@ -26,7 +26,7 @@ public class PlayerManager : MonoBehaviour
         else if (collision.gameObject.CompareTag("enemyBullet"))
         {
             health--;
-            if (health == 0)
+            if (health <= 0)
             {
                 destroyScript.Destroying();
             }

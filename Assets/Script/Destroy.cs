@@ -6,24 +6,27 @@ public class Destroy : MonoBehaviour
 {
     public bool isObject = false;
     const float DESTROY_TIME = 0.5f;
-    public int tradeScore = 0;
     public bool isAnimationFinished = false;
-    public GameManager gameManager;
-    public GameObject player;
+    private GameManager gameManager;
+    private GameObject player;
+    public bool isPlayer = false;
 
     void Start()
     {
+        player = GameObject.FindWithTag("Player");
         if (!isObject)
         {
             StartCoroutine(DestroyTime());
         }
+        GameObject gameManagerObj = GameObject.FindWithTag("GameController");
+        gameManager = gameManagerObj.GetComponent<GameManager>();
+        Debug.Log(gameManager.isLose);
     }
 
     private void Update()
     {
         if (isAnimationFinished)
         {
-            TradeScore();
             Destroying();
         }
     }
@@ -36,16 +39,14 @@ public class Destroy : MonoBehaviour
 
     public void Destroying()
     {
-        if (gameObject == player)
+        if (isPlayer)
         {
             gameManager.isLose = true;
+            player.SetActive(false);
         }
-        Destroy(gameObject);
-    }
-
-    public void TradeScore()
-    {
-
-        tradeScore = 20;
+        else
+        {
+            Destroy(gameObject);
+        }
     }
 }

@@ -56,13 +56,14 @@ public class Death : NetworkBehaviour
 
         yield return new WaitForSeconds(deathTime);
 
-        connectionToServer?.Disconnect(); // NetworkManagerのスクリプト確認。Disconnect以外でなにか、、
+        SceneManager.LoadScene("Finish");
+        NetworkManager.singleton.StopClient();
     }
 
     override public void OnStopClient()
     {
         SceneManager.LoadScene("Finish");
         var manager = NetworkManager.singleton;
-        Destroy(manager.gameObject);
+        manager.StopClient();
     }
 }

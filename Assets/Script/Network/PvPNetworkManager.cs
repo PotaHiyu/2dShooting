@@ -349,6 +349,8 @@ public class PvPNetworkManager : NetworkManager
         for (int index = 0; index < SceneManager.sceneCount; index++)
             if (SceneManager.GetSceneAt(index) != SceneManager.GetActiveScene())
                 yield return SceneManager.UnloadSceneAsync(SceneManager.GetSceneAt(index));
+
+        SceneManager.LoadScene("OnlineFinish");
     }
 
     #endregion

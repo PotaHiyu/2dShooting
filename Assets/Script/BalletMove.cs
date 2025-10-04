@@ -2,20 +2,57 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
+public enum BulletMoveType
+{
+    Straight,
+    Curve
+}
+
 public class BalletMove : MonoBehaviour
 {
     public bool isPlayer;
     public float speed;
     private float rand;
     private Destroy destroyScript;
+    public BulletMoveType bulletMoveType = BulletMoveType.Straight;
 
     void Start()
     {
         destroyScript = GetComponent<Destroy>();
     }
 
-
     void FixedUpdate()
+    {
+        switch (bulletMoveType)
+        {
+            case BulletMoveType.Straight:
+                Straight();
+                break;
+            case BulletMoveType.Curve:
+                Curve();
+                break;
+        }
+    }
+
+    public static BulletMoveType NextBulletMoveType(BulletMoveType bulletMoveType)
+    {
+        switch (bulletMoveType)
+        {
+            case BulletMoveType.Straight:
+                return BulletMoveType.Curve;
+            case BulletMoveType.Curve:
+                return BulletMoveType.Straight;
+            default:
+                return BulletMoveType.Straight;
+        }
+    }
+
+    void Curve()
+    {
+        Debug.Log("Curve");
+    }
+
+    void Straight()
     {
         rand = Random.Range(-0.01f, 0.02f);
         Vector3  movement = new Vector3(0, rand, 0);
