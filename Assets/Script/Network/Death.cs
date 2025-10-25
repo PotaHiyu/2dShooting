@@ -11,7 +11,7 @@ public class Death : NetworkBehaviour
     public GameObject deathVFX;
     public float deathTime = 2f;
     public float zoomTime = 2f;
-    
+
     void Start()
     {
         Health health = GetComponent<Health>();
@@ -27,7 +27,7 @@ public class Death : NetworkBehaviour
 
     public static float Ease(float t)
     {
-        if(t < 0.5f) 
+        if(t < 0.5f)
         return 8f * t * t * t * t;
         var x = -2 * t + 2;
         return 1 - x * x * x * x / 2;
@@ -56,13 +56,13 @@ public class Death : NetworkBehaviour
 
         yield return new WaitForSeconds(deathTime);
 
-        SceneManager.LoadScene("Finish");
+        // SceneManager.LoadScene("Finish");
         NetworkManager.singleton.StopClient();
     }
 
     override public void OnStopClient()
     {
-        SceneManager.LoadScene("Finish");
+        SceneManager.LoadScene("OnlineFinish");
         var manager = NetworkManager.singleton;
         manager.StopClient();
     }

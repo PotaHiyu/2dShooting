@@ -18,7 +18,7 @@ MonoBehaviour:
   m_PlatformId: 8659dec1db6b4fac86149f99f2fa4291
   m_PlatformBuildProfile:
     rid: 2299107658530291713
-  m_OverrideGlobalSceneList: 1
+  m_OverrideGlobalSceneList: 0
   m_Scenes:
   - m_enabled: 1
     m_path: Assets/Scenes/Online.unity

@@ -19,6 +19,7 @@ public class NetworkMove : NetworkBehaviour
     private int showCount = 5;
     public TextMeshProUGUI showCountText;
     private BulletMoveType bulletMoveType = BulletMoveType.Straight;
+    private OnlineGameManager ogm;
 
     private void Start()
     {
@@ -27,17 +28,20 @@ public class NetworkMove : NetworkBehaviour
         {
             showCountText.text = "✖" + showCount.ToString();
         }
+        ogm = FindAnyObjectByType<OnlineGameManager>();
     }
 
     void Update()
     {
-        if (isLocalPlayer && Input.GetKeyDown(KeyCode.V)) 
+        if (ogm == null || ogm.gameState != GameState.Playing) return;
+        if (isLocalPlayer && Input.GetKeyDown(KeyCode.V))
         {
             bulletMoveType = BalletMove.NextBulletMoveType(bulletMoveType);
         }
         if (isLocalPlayer && Input.GetKey(KeyCode.Space) && timer <= 0.0f && !limitMode)
         {
-            CmdShoot(bulletSpawnPoint.position, transform.rotation, bulletMoveType);
+            var offset = bulletSpawnPoint.position - transform.position;
+            CmdShoot(offset, transform.rotation, bulletMoveType);
             timer = interval;
             if (showCount > 0 && useLimitMode)
             {
@@ -59,11 +63,12 @@ public class NetworkMove : NetworkBehaviour
     }
 
     [Command]
-    void CmdShoot(Vector2 pos, Quaternion rotation, BulletMoveType bulletMoveType)
+    void CmdShoot(Vector2 offset, Quaternion rotation, BulletMoveType bulletMoveType)
     {
         var pvpNetworkManager = FindFirstObjectByType<PvPNetworkManager>();
         if (pvpNetworkManager == null) return;
 
+        Vector2 pos = new Vector2(transform.position.x, transform.position.y) + offset;
         GameObject bullet = Instantiate(prefabBullet, pos, rotation);
         NetworkServer.Spawn(bullet);
         pvpNetworkManager.MoveToScene(connectionToClient, bullet);
@@ -74,10 +79,11 @@ public class NetworkMove : NetworkBehaviour
 
     void FixedUpdate()
     {
+        if (ogm == null || ogm.gameState != GameState.Playing) return;
         float horizontalInput = Input.GetAxis("Horizontal");
         float verticalInput = Input.GetAxis("Vertical");
-        
-        Vector3 movement = new Vector3(horizontalInput, verticalInput, 0) * speed * Time.deltaTime;
+
+        Vector3 movement = new Vector3(horizontalInput, verticalInput, 0) * speed * Time.fixedDeltaTime;
         transform.Translate(movement);
     }
 }

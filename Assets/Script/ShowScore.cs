@@ -13,16 +13,16 @@ public class ShowScore : MonoBehaviour
     // Start is called once before the first execution of Update after the MonoBehaviour is created
     void Start()
     {
-        dontDestroyObj = GameObject.Find("DontDestroyOnLoad").GetComponent<DontDestroyOnLoad>();
-        uploader = gameObject.GetComponent<LeaderboardUploader>();
-        scoreText.text = "Score: " + Mathf.FloorToInt(dontDestroyObj.score).ToString();
+        // dontDestroyObj = GameObject.Find("DontDestroyOnLoad").GetComponent<DontDestroyOnLoad>();
+        // uploader = gameObject.GetComponent<LeaderboardUploader>();
+        // scoreText.text = "Score: " + Mathf.FloorToInt(dontDestroyObj.score).ToString();
     }
 
     public void OnSubmit()
     {
-        string inputText = inputField.text;
-        uploader.SaveData(Mathf.FloorToInt(dontDestroyObj.score), inputText);
+        // string inputText = inputField.text;
+        // uploader.SaveData(Mathf.FloorToInt(dontDestroyObj.score), inputText);
 
-        submitButton.isInteractable = false;
+        // submitButton.isInteractable = false;
     }
 }

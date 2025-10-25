@@ -9,12 +9,14 @@ public class GameStateUIManager : MonoBehaviour
 
     void Start()
     {
-        OnlineGameManager.instance.onGameStateChanged += ShowState;
-        ShowState(OnlineGameManager.instance.gameState);
+        var ogm = FindAnyObjectByType<OnlineGameManager>();
+        ogm.onGameStateChanged += ShowState;
+        ShowState(ogm.gameState);
     }
 
     void ShowState(GameState state)
     {
+        Debug.Log($"ShowState({state})");
         if (waitingUI != null) waitingUI.SetActive(state == GameState.WaitingForPlayers);
         if (countdownUI != null) countdownUI.SetActive(state == GameState.Countdown);
         if (playingUI != null) playingUI.SetActive(state == GameState.Playing);
