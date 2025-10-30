@@ -11,11 +11,13 @@ public class Match
     {
         GameScene = scene;
         MaxPlayers = maxPlayers;
+        players = new NetworkConnectionToClient[maxPlayers];
         NumberOfPlayers = 0;
     }
 
-    public bool AddPlayer()
+    public bool AddPlayer(NetworkConnectionToClient conn)
     {
+        players[NumberOfPlayers] = conn;
         NumberOfPlayers++;
         Debug.Log($"Added: Match now has {NumberOfPlayers} / {MaxPlayers} players...");
         return IsFull;
@@ -26,6 +28,7 @@ public class Match
     public bool IsFull => NumberOfPlayers >= MaxPlayers;
     public int MaxPlayers { get; }
     public int NumberOfPlayers { get; private set; }
+    public NetworkConnectionToClient[] players;
 
     public bool RemovePlayer()
     {
@@ -53,6 +56,7 @@ public class PvPNetworkManager : NetworkManager
     private Match currentMatch = null;
     private bool matchReady => currentMatch != null;
     private Dictionary<int, Match> clientMatches = new Dictionary<int, Match>();
+    public int matchCountdown = 3;
 
 
     /// <summary>
@@ -205,10 +209,22 @@ public class PvPNetworkManager : NetworkManager
             currentMatch.GameScene);
         clientMatches.Add(conn.connectionId, currentMatch);
 
-        if (currentMatch.AddPlayer())
+        if (currentMatch.AddPlayer(conn))
         {
+            Match thisMatch = currentMatch;
             currentMatch = null;
-            StartCoroutine(ServerLoadSubScene());
+            yield return StartCoroutine(ServerLoadSubScene());
+            foreach (NetworkConnectionToClient player in thisMatch.players)
+            {
+                GameStart gs = player.identity.GetComponent<GameStart>();
+                if (gs != null) gs.RpcStartCountdown(matchCountdown);
+            }
+            yield return new WaitForSeconds(matchCountdown);
+            foreach (NetworkConnectionToClient player in thisMatch.players)
+            {
+                GameStart gs = player.identity.GetComponent<GameStart>();
+                if (gs != null) gs.RpcStartPlaying();
+            }
         }
     }
 
@@ -218,6 +234,7 @@ public class PvPNetworkManager : NetworkManager
         if (clientMatches.ContainsKey(id) && clientMatches[id].GameScene.IsValid())
         {
             SceneManager.MoveGameObjectToScene(obj, clientMatches[id].GameScene);
+            Destroy(gameObject);
         }
     }
 
@@ -351,6 +368,7 @@ public class PvPNetworkManager : NetworkManager
                 yield return SceneManager.UnloadSceneAsync(SceneManager.GetSceneAt(index));
 
         SceneManager.LoadScene("OnlineFinish");
+        Destroy(gameObject);
     }
 
     #endregion

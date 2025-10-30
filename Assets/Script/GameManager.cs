@@ -32,7 +32,6 @@ public class GameManager : MonoBehaviour
     public float speedIncreasePerScore = 0.01f;
     public float intervalDecreasePerScore = 0.01f;
     public int enemyHpBonus = 0;
-    public string gameOverSceneName = "Finish";
     private bool gameMode = ChooseMode.mode;
     public TextMeshProUGUI scoreText;
     private TextMeshProUGUI scoreTextCom;
@@ -123,6 +122,6 @@ public class GameManager : MonoBehaviour
         Debug.Log("GAME OVER");
         dontDestroyObj.score = score;
         yield return new WaitForSeconds(3f);
-        SceneManager.LoadScene(gameOverSceneName);
+        SceneManager.LoadScene("Finish");
     }
 }

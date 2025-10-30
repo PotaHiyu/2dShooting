@@ -10,10 +10,10 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: a689d91966dfb46499fb63f130d9b905, type: 3}
-  m_Name: NewPlayModeScenario
+  m_Name: NewPlayModeScenario 1
   m_EditorClassIdentifier: 
   m_Description: 
-  m_EnableEditors: 1
+  m_EnableEditors: 0
   m_MainEditorInstance:
     Name: Main Editor
     <CorrespondingNodeId>k__BackingField: Main Editor|0_run
@@ -29,27 +29,37 @@ MonoBehaviour:
     m_Nodes:
     - Player1 - Build
     - Player1 - Run
-    m_BuildProfile: {fileID: 11400000, guid: 6f32e35d8f4094ea8a93ed45ede7a6f9, type: 2}
+    m_BuildProfile: {fileID: 11400000, guid: 2b05cd870cb50478e9710106fe815164, type: 2}
     advancedConfiguration:
       m_StreamLogsToMainEditor: 1
-      m_LogsColor: {r: 0.36470592, g: 0.8666667, b: 0.3831579, a: 1}
+      m_LogsColor: {r: 0.3643, g: 0.581, b: 0.8679, a: 1}
       m_Arguments: -screen-fullscreen 0 -screen-width 1024 -screen-height 720
   - Name: Player2
     <CorrespondingNodeId>k__BackingField: Player2 - Run
     m_Nodes:
     - Player2 - Build
     - Player2 - Run
-    m_BuildProfile: {fileID: 11400000, guid: 6f32e35d8f4094ea8a93ed45ede7a6f9, type: 2}
+    m_BuildProfile: {fileID: 11400000, guid: 2b05cd870cb50478e9710106fe815164, type: 2}
     advancedConfiguration:
       m_StreamLogsToMainEditor: 1
-      m_LogsColor: {r: 0.8666667, g: 0.36470592, b: 0.38435996, a: 1}
+      m_LogsColor: {r: 0.3643, g: 0.581, b: 0.8679, a: 1}
       m_Arguments: -screen-fullscreen 0 -screen-width 1024 -screen-height 720
-  - Name: Server
-    <CorrespondingNodeId>k__BackingField: Server - Run
+  - Name: Player3
+    <CorrespondingNodeId>k__BackingField: Player3 - Run
     m_Nodes:
-    - Server - Build
-    - Server - Run
-    m_BuildProfile: {fileID: 11400000, guid: 9b392d8afb9d64db79acc817e9d44c05, type: 2}
+    - Player3 - Build
+    - Player3 - Run
+    m_BuildProfile: {fileID: 11400000, guid: 2b05cd870cb50478e9710106fe815164, type: 2}
+    advancedConfiguration:
+      m_StreamLogsToMainEditor: 1
+      m_LogsColor: {r: 0.3643, g: 0.581, b: 0.8679, a: 1}
+      m_Arguments: -screen-fullscreen 0 -screen-width 1024 -screen-height 720
+  - Name: Player4
+    <CorrespondingNodeId>k__BackingField: Player4 - Run
+    m_Nodes:
+    - Player4 - Build
+    - Player4 - Run
+    m_BuildProfile: {fileID: 11400000, guid: 2b05cd870cb50478e9710106fe815164, type: 2}
     advancedConfiguration:
       m_StreamLogsToMainEditor: 1
       m_LogsColor: {r: 0.3643, g: 0.581, b: 0.8679, a: 1}

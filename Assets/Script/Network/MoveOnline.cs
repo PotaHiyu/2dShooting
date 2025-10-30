@@ -5,7 +5,7 @@ using UnityEngine;
 using TMPro;
 using Mirror;
 
-public class MoveOnline : MonoBehaviour
+public class MoveOnline : NetworkBehaviour
 {
     private float speed = 10f;
     public GameObject prefabBullet;
@@ -31,13 +31,15 @@ public class MoveOnline : MonoBehaviour
 
     void Update()
     {
+        // ローカルプレイヤーのみ入力を処理
+        if (!isLocalPlayer) return;
+
         pos = gameObject.transform.position;
         pos.x += 1f;
 
         if (Input.GetKey(KeyCode.Space) && timer <= 0.0f && !limitMode)
         {
-            GameObject bullet = Instantiate(prefabBullet, pos, Quaternion.identity);
-            NetworkServer.Spawn(bullet);
+            CmdFireBullet(pos);
             timer = interval;
             if (showCount > 0 && useLimitMode)
             {
@@ -60,10 +62,31 @@ public class MoveOnline : MonoBehaviour
 
     void FixedUpdate()
     {
+        // ローカルプレイヤーのみ移動処理
+        if (!isLocalPlayer) return;
+
         float horizontalInput = Input.GetAxis("Horizontal");
         float verticalInput = Input.GetAxis("Vertical");
 
         Vector3 movement = new Vector3(horizontalInput, verticalInput, 0) * speed * Time.deltaTime;
         transform.Translate(movement);
+    }
+
+    [Command]
+    void CmdFireBullet(Vector2 firePosition)
+    {
+        if (prefabBullet != null)
+        {
+            GameObject bullet = Instantiate(prefabBullet, firePosition, Quaternion.identity);
+            
+            // 弾がプレイヤーの弾であることを設定
+            OnlineBulletMove bulletScript = bullet.GetComponent<OnlineBulletMove>();
+            if (bulletScript != null)
+            {
+                bulletScript.isPlayer = true;
+            }
+            
+            NetworkServer.Spawn(bullet);
+        }
     }
 }

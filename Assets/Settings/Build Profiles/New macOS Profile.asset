@@ -25,9 +25,13 @@ MonoBehaviour:
   - m_enabled: 1
     m_path: Assets/Scenes/Online.unity
   - m_enabled: 1
+    m_path: Assets/Scenes/1-1.unity
+  - m_enabled: 1
     m_path: Assets/Scenes/1vs1.unity
   - m_enabled: 1
     m_path: Assets/Scenes/Finish.unity
+  - m_enabled: 1
+    m_path: Assets/Scenes/OnlineFinish.unity
   m_ScriptingDefines: []
   m_PlayerSettingsYaml:
     m_Settings: []

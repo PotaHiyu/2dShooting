@@ -56,13 +56,12 @@ public class Death : NetworkBehaviour
 
         yield return new WaitForSeconds(deathTime);
 
-        SceneManager.LoadScene("Finish");
         NetworkManager.singleton.StopClient();
     }
 
     override public void OnStopClient()
     {
-        SceneManager.LoadScene("Finish");
+        SceneManager.LoadScene("OnlineFinish");
         var manager = NetworkManager.singleton;
         manager.StopClient();
     }

@@ -9,8 +9,9 @@ public class GameStateUIManager : MonoBehaviour
 
     void Start()
     {
-        OnlineGameManager.instance.onGameStateChanged += ShowState;
-        ShowState(OnlineGameManager.instance.gameState);
+        var ogm = FindAnyObjectByType<OnlineGameManager>();
+        ogm.onGameStateChanged += ShowState;
+        ShowState(ogm.gameState);
     }
 
     void ShowState(GameState state)

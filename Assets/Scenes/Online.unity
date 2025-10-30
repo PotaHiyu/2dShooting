@@ -497,6 +497,7 @@ GameObject:
   - component: {fileID: 1090688898}
   - component: {fileID: 1090688897}
   - component: {fileID: 1090688899}
+  - component: {fileID: 1090688900}
   m_Layer: 0
   m_Name: NetworkManager
   m_TagString: Untagged
@@ -526,7 +527,7 @@ MonoBehaviour:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1090688892}
-  m_Enabled: 1
+  m_Enabled: 0
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 6442dc8070ceb41f094e44de0bf87274, type: 3}
   m_Name: 
@@ -545,7 +546,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 6b0fecffa3f624585964b0d0eb21b18e, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  port: 7777
+  port: 45081
   DualMode: 1
   NoDelay: 1
   Interval: 10
@@ -614,6 +615,7 @@ MonoBehaviour:
   leftPlayerStart: {fileID: 0}
   rightPlayerStart: {fileID: 0}
   gameScene: Assets/Scenes/1vs1.unity
+  matchCountdown: 3
 --- !u!114 &1090688897
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -636,10 +638,10 @@ MonoBehaviour:
   sslEnabled: 0
   sslProtocols: 3072
   sslCertJson: ./cert.json
-  port: 7778
+  port: 45082
   batchSend: 1
   waitBeforeSend: 1
-  clientUseWss: 0
+  clientUseWss: 1
   clientWebsocketSettings:
     ClientPortOption: 0
     CustomClientPort: 0
@@ -671,6 +673,19 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: b979f26c95d34324ba005bfacfa9c4fc, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+--- !u!114 &1090688900
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1090688892}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: b0c4a1a3bd7f442b3aedda4cba46c8b9, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  clientWssPort: 443
 --- !u!1001 &1210230884980968341
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -1098,28 +1113,8 @@ PrefabInstance:
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
-    m_AddedComponents:
-    - targetCorrespondingSourceObject: {fileID: 1210230884505376143, guid: 3017a250283954d129f37754a55b8d83, type: 3}
-      insertIndex: -1
-      addedObject: {fileID: 1210230884980968343}
+    m_AddedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 3017a250283954d129f37754a55b8d83, type: 3}
---- !u!1 &1210230884980968342 stripped
-GameObject:
-  m_CorrespondingSourceObject: {fileID: 1210230884505376143, guid: 3017a250283954d129f37754a55b8d83, type: 3}
-  m_PrefabInstance: {fileID: 1210230884980968341}
-  m_PrefabAsset: {fileID: 0}
---- !u!114 &1210230884980968343
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1210230884980968342}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: b0c4a1a3bd7f442b3aedda4cba46c8b9, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
 --- !u!1660057539 &9223372036854775807
 SceneRoots:
   m_ObjectHideFlags: 0

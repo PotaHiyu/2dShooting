@@ -1,6 +1,5 @@
 using System.Collections;
 using System.Collections.Generic;
-//using System.Numerics;
 using UnityEngine;
 using TMPro;
 
@@ -18,6 +17,8 @@ public class Move : MonoBehaviour
     public bool debugMode = true;
     private int showCount = 5;
     public TextMeshProUGUI showCountText;
+    
+    private BulletConfig bulletConfig;
     private void Start()
     {
         useLimitMode = ChooseMode.mode;
@@ -25,6 +26,20 @@ public class Move : MonoBehaviour
         {
             showCountText.text = "✖" + showCount.ToString();
         }
+        
+        bulletConfig = GetComponent<BulletConfig>();
+        if (bulletConfig == null)
+        {
+            bulletConfig = gameObject.AddComponent<BulletConfig>();
+        }
+        
+        bulletConfig.OnBulletSettingsChanged += OnBulletSettingsChanged;
+        OnBulletSettingsChanged(bulletConfig.GetCurrentSettings());
+    }
+    
+    private void OnBulletSettingsChanged(BulletSettings newSettings)
+    {
+        interval = newSettings.fireRate;
     }
 
     void Update()
@@ -34,13 +49,13 @@ public class Move : MonoBehaviour
 
         if (debugMode && timer <= 0.0f)
         {
-            Instantiate(prefabBullet, pos, Quaternion.identity);
+            FireBullet(pos);
             timer = interval;
         }
 
         if (!debugMode && Input.GetKey(KeyCode.Space) && timer <= 0.0f && !limitMode)
         {
-            Instantiate(prefabBullet, pos, Quaternion.identity);
+            FireBullet(pos);
             timer = interval;
             if (showCount > 0 && useLimitMode)
             {
@@ -58,6 +73,34 @@ public class Move : MonoBehaviour
         if (timer > 0.0f)
         {
             timer -= Time.deltaTime;
+        }
+    }
+
+    private void FireBullet(Vector2 position)
+    {
+        BulletSettings settings = bulletConfig.GetCurrentSettings();
+        
+        for (int i = 0; i < settings.multiShot; i++)
+        {
+            float angle = 0f;
+            if (settings.multiShot > 1)
+            {
+                float totalSpread = settings.spreadAngle * (settings.multiShot - 1);
+                angle = -totalSpread / 2f + (settings.spreadAngle * i);
+            }
+            
+            Quaternion rotation = Quaternion.Euler(0, 0, angle);
+            GameObject bullet = Instantiate(prefabBullet, position, rotation);
+            
+            bullet.transform.localScale = settings.scale;
+            
+            BalletMove bulletMove = bullet.GetComponent<BalletMove>();
+            if (bulletMove != null)
+            {
+                bulletMove.speed = settings.speed;
+                bulletMove.damage = settings.damage;
+                bulletMove.piercing = settings.piercing;
+            }
         }
     }
 

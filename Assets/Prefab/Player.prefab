@@ -16,6 +16,7 @@ GameObject:
   - component: {fileID: 7563012468832602259}
   - component: {fileID: 7336388898348068186}
   - component: {fileID: 985637426461666226}
+  - component: {fileID: -311768665786896523}
   m_Layer: 0
   m_Name: Player
   m_TagString: Player
@@ -128,9 +129,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   isObject: 1
-  tradeScore: 0
   isAnimationFinished: 0
-  gameManager: {fileID: 1210230884505376142, guid: 367c6f84116504312b33039162638e98, type: 3}
   isPlayer: 1
 --- !u!70 &8475937186159970588
 CapsuleCollider2D:
@@ -226,3 +225,32 @@ MonoBehaviour:
   useLimitMode: 0
   debugMode: 1
   showCountText: {fileID: 0}
+--- !u!114 &-311768665786896523
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1467079706434495311}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 33c720f370fd443dcad2becba6fc75be, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  defaultSettings:
+    speed: 10
+    fireRate: 0.5
+    scale: {x: 1, y: 1, z: 1}
+    damage: 1
+    piercing: 0
+    multiShot: 1
+    spreadAngle: 0
+  currentSettings:
+    speed: 10
+    fireRate: 0.5
+    scale: {x: 1, y: 1, z: 1}
+    damage: 1
+    piercing: 0
+    multiShot: 1
+    spreadAngle: 0
+  activeEffects: []

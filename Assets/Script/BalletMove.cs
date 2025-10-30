@@ -12,6 +12,8 @@ public class BalletMove : MonoBehaviour
 {
     public bool isPlayer;
     public float speed;
+    public int damage = 1;
+    public bool piercing = false;
     private float rand;
     private Destroy destroyScript;
     public BulletMoveType bulletMoveType = BulletMoveType.Straight;
@@ -62,15 +64,33 @@ public class BalletMove : MonoBehaviour
         transform.position += movement;
     }
 
-        void OnTriggerEnter2D(Collider2D collision)
+    void OnTriggerEnter2D(Collider2D collision)
+    {
+        if (collision.gameObject.CompareTag("Player") && isPlayer == false)
         {
-            if (collision.gameObject.CompareTag("Player") && isPlayer == false)
+            PlayerManager playerManager = collision.GetComponent<PlayerManager>();
+            if (playerManager != null)
             {
-                destroyScript.Destroying();
+                playerManager.health -= damage;
             }
-            else if (collision.gameObject.CompareTag("Enemy") && isPlayer == true)
+            
+            if (!piercing)
             {
                 destroyScript.Destroying();
             }
         }
+        else if (collision.gameObject.CompareTag("Enemy") && isPlayer == true)
+        {
+            EnemyManager enemyManager = collision.GetComponent<EnemyManager>();
+            if (enemyManager != null)
+            {
+                enemyManager.health -= damage;
+            }
+            
+            if (!piercing)
+            {
+                destroyScript.Destroying();
+            }
+        }
+    }
 }

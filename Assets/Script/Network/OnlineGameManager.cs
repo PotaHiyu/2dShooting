@@ -11,7 +11,7 @@ public enum GameState
 
 public class OnlineGameManager : NetworkBehaviour
 {
-    public static OnlineGameManager instance;
+    // public static OnlineGameManager instance;
     public UnityAction<GameState> onGameStateChanged;
     protected GameState gameState_ = GameState.WaitingForPlayers;
     public GameState gameState
@@ -27,13 +27,16 @@ public class OnlineGameManager : NetworkBehaviour
         }
     }
 
-    private void Awake() 
+    public int countdownTime = 3;
+
+    public void StartCountdown(int time)
     {
-        if (instance != null)
-        {
-            Destroy(gameObject);
-            return;
-        }
-        instance = this;
+        countdownTime = time;
+        gameState = GameState.Countdown;
+    }
+
+    public void StartPlaying()
+    {
+        gameState = GameState.Playing;
     }
 }
