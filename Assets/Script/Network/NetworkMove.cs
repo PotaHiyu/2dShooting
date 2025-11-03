@@ -23,49 +23,31 @@ public class NetworkMove : NetworkBehaviour
 
     private void Start()
     {
-        Debug.Log($"NetworkMove.Start: isLocalPlayer={isLocalPlayer}, netId={netId}");
         useLimitMode = ChooseMode.mode;
         if (useLimitMode && showCountText != null)
         {
             showCountText.text = "✖" + showCount.ToString();
         }
-        if (bulletSpawnPoint == null)
-        {
-            Debug.LogWarning("bulletSpawnPoint is not assigned! Using player position instead.");
-        }
-        
         ogm = FindAnyObjectByType<OnlineGameManager>();
-        if (ogm == null)
-        {
-            Debug.LogWarning("OnlineGameManager not found!");
-        }
     }
 
     void Update()
     {
-        if (!isLocalPlayer) return;
         if (ogm == null || ogm.gameState != GameState.Playing) return;
-        
-        if (Input.GetKeyDown(KeyCode.V)) 
+        if (isLocalPlayer && Input.GetKeyDown(KeyCode.V)) 
         {
             bulletMoveType = BalletMove.NextBulletMoveType(bulletMoveType);
         }
-        
-        if (Input.GetKey(KeyCode.Space) && timer <= 0.0f && !limitMode)
+        if (isLocalPlayer && Input.GetKey(KeyCode.Space) && timer <= 0.0f && !limitMode)
         {
-            Debug.Log("Space key pressed, shooting...");
-            var offset = bulletSpawnPoint != null ? bulletSpawnPoint.position - transform.position : Vector3.right;
+            var offset = bulletSpawnPoint.position - transform.position;
             CmdShoot(offset, transform.rotation, bulletMoveType);
             timer = interval;
-            
             if (showCount > 0 && useLimitMode)
             {
                 count += 1;
                 showCount -= 1;
-                if (showCountText != null)
-                {
-                    showCountText.text = "✖" + showCount.ToString();
-                }
+                showCountText.text = "✖" + showCount.ToString();
             }
         }
 
@@ -83,55 +65,19 @@ public class NetworkMove : NetworkBehaviour
     [Command]
     void CmdShoot(Vector2 offset, Quaternion rotation, BulletMoveType bulletMoveType)
     {
-        Debug.Log("CmdShoot called on server");
-        
         var pvpNetworkManager = FindFirstObjectByType<PvPNetworkManager>();
-        if (pvpNetworkManager == null)
-        {
-            Debug.LogError("PvPNetworkManager not found!");
-            return;
-        }
-
-        if (prefabBullet == null)
-        {
-            Debug.LogError("prefabBullet is null!");
-            return;
-        }
+        if (pvpNetworkManager == null) return;
 
         Vector2 pos = new Vector2(transform.position.x, transform.position.y) + offset;
-        Debug.Log($"Instantiating bullet at {pos}");
-        
         GameObject bullet = Instantiate(prefabBullet, pos, rotation);
-        
-        if (bullet == null)
-        {
-            Debug.LogError("Failed to instantiate bullet!");
-            return;
-        }
-        
         NetworkServer.Spawn(bullet);
-        Debug.Log("Bullet spawned on network");
-        
         pvpNetworkManager.MoveToScene(connectionToClient, bullet);
-        
-        Owner ownerComponent = bullet.GetComponent<Owner>();
-        if (ownerComponent != null)
-        {
-            ownerComponent.owner = netId;
-        }
-        
-        OnlineBulletMove bulletMove = bullet.GetComponent<OnlineBulletMove>();
-        if (bulletMove != null)
-        {
-            bulletMove.bulletMoveType = bulletMoveType;
-        }
-        
-        Debug.Log("Bullet setup complete");
+        bullet.GetComponent<Owner>().owner = netId;
+        bullet.GetComponent<OnlineBulletMove>().bulletMoveType = bulletMoveType;
     }
 
     void FixedUpdate()
     {
-        if (!isLocalPlayer) return;
         if (ogm == null || ogm.gameState != GameState.Playing) return;
         
         float horizontalInput = Input.GetAxis("Horizontal");

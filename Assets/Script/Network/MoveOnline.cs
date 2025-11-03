@@ -31,15 +31,14 @@ public class MoveOnline : NetworkBehaviour
 
     void Update()
     {
-        // ローカルプレイヤーのみ入力を処理
-        if (!isLocalPlayer) return;
-
         pos = gameObject.transform.position;
         pos.x += 1f;
 
         if (Input.GetKey(KeyCode.Space) && timer <= 0.0f && !limitMode)
         {
-            CmdFireBullet(pos);
+            // CmdFireBullet(pos);
+            GameObject bullet = Instantiate(prefabBullet, pos, Quaternion.identity);
+            NetworkServer.Spawn(bullet);
             timer = interval;
             if (showCount > 0 && useLimitMode)
             {
@@ -62,9 +61,6 @@ public class MoveOnline : NetworkBehaviour
 
     void FixedUpdate()
     {
-        // ローカルプレイヤーのみ移動処理
-        if (!isLocalPlayer) return;
-
         float horizontalInput = Input.GetAxis("Horizontal");
         float verticalInput = Input.GetAxis("Vertical");
 
@@ -72,21 +68,21 @@ public class MoveOnline : NetworkBehaviour
         transform.Translate(movement);
     }
 
-    [Command]
-    void CmdFireBullet(Vector2 firePosition)
-    {
-        if (prefabBullet != null)
-        {
-            GameObject bullet = Instantiate(prefabBullet, firePosition, Quaternion.identity);
+    // [Command]
+    // void CmdFireBullet(Vector2 firePosition)
+    // {
+    //     if (prefabBullet != null)
+    //     {
+    //         GameObject bullet = Instantiate(prefabBullet, firePosition, Quaternion.identity);
             
-            // 弾がプレイヤーの弾であることを設定
-            OnlineBulletMove bulletScript = bullet.GetComponent<OnlineBulletMove>();
-            if (bulletScript != null)
-            {
-                bulletScript.isPlayer = true;
-            }
+    //         // 弾がプレイヤーの弾であることを設定
+    //         OnlineBulletMove bulletScript = bullet.GetComponent<OnlineBulletMove>();
+    //         if (bulletScript != null)
+    //         {
+    //             bulletScript.isPlayer = true;
+    //         }
             
-            NetworkServer.Spawn(bullet);
-        }
-    }
+    //         NetworkServer.Spawn(bullet);
+    //     }
+    // }
 }
