@@ -20,6 +20,7 @@ public class NetworkMove : NetworkBehaviour
     public TextMeshProUGUI showCountText;
     private BulletMoveType bulletMoveType = BulletMoveType.Straight;
     private OnlineGameManager ogm;
+    private bool isShoot = false;
 
     private void Start()
     {
@@ -37,6 +38,10 @@ public class NetworkMove : NetworkBehaviour
         if (isLocalPlayer && Input.GetKeyDown(KeyCode.V))
         {
             bulletMoveType = BalletMove.NextBulletMoveType(bulletMoveType);
+        }
+        if (isLocalPlayer)
+        {
+            isShoot = Input.GetKey(KeyCode.Space);
         }
         if (isLocalPlayer && Input.GetKey(KeyCode.Space) && timer <= 0.0f && !limitMode)
         {
@@ -82,8 +87,9 @@ public class NetworkMove : NetworkBehaviour
         if (ogm == null || ogm.gameState != GameState.Playing) return;
         float horizontalInput = Input.GetAxis("Horizontal");
         float verticalInput = Input.GetAxis("Vertical");
+        float currentSpeed = isShoot ? speed / 2f : speed;
 
-        Vector3 movement = new Vector3(horizontalInput, verticalInput, 0) * speed * Time.fixedDeltaTime;
+        Vector3 movement = new Vector3(horizontalInput, verticalInput, 0) * currentSpeed * Time.fixedDeltaTime;
         transform.Translate(movement);
     }
 }

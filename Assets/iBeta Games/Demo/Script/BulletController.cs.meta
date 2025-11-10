@@ -1,0 +1,18 @@
+fileFormatVersion: 2
+guid: f4c78169a5650c746becbd34616315cd
+MonoImporter:
+  externalObjects: {}
+  serializedVersion: 2
+  defaultReferences: []
+  executionOrder: 0
+  icon: {instanceID: 0}
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 254453
+  packageName: 2D Bullet Lasers
+  packageVersion: 1.0
+  assetPath: Assets/iBeta Games/Demo/Script/BulletController.cs
+  uploadId: 597731

@@ -1,0 +1,18 @@
+fileFormatVersion: 2
+guid: 2a9e03ff0d97a064ca1163e73223800c
+MonoImporter:
+  externalObjects: {}
+  serializedVersion: 2
+  defaultReferences: []
+  executionOrder: 0
+  icon: {instanceID: 0}
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 254453
+  packageName: 2D Bullet Lasers
+  packageVersion: 1.0
+  assetPath: Assets/iBeta Games/Demo/Script/ShootDemo.cs
+  uploadId: 597731
