@@ -7,6 +7,8 @@ public class OnlineBulletMove : NetworkBehaviour
 {
     public bool isPlayer;
     public float speed;
+    private float baseSpeed;
+    [SyncVar] public float speedMultiplier = 1f;
     // public int damage;
     // public bool piercing = false;
     [SyncVar] private float rand;
@@ -17,6 +19,7 @@ public class OnlineBulletMove : NetworkBehaviour
     void Start()
     {
         destroyScript = GetComponent<Destroy>();
+        baseSpeed = speed;
         if (isServer)
         {
             rand = Random.Range(-0.01f, 0.01f);

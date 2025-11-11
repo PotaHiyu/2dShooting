@@ -201,9 +201,7 @@ MonoBehaviour:
   syncInterval: 0
   prefabBullet: {fileID: 8500497175655295960, guid: 3d1a03090caae40118dfa6161dbec4af, type: 3}
   bulletSpawnPoint: {fileID: 4701042519557163682}
-  limitBullet: 0
-  useLimitMode: 0
-  showCountText: {fileID: 0}
+  powerUpMultiplier: 1.5
 --- !u!114 &2147737970693114017
 MonoBehaviour:
   m_ObjectHideFlags: 0

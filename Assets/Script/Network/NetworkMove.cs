@@ -7,29 +7,33 @@ using Mirror;
 
 public class NetworkMove : NetworkBehaviour
 {
-    private float speed = 10f;
+    
+    [SyncVar] public float speed = 5f;
+    private float baseSpeed = 5f;
     public GameObject prefabBullet;
     public Transform bulletSpawnPoint;
     private float interval = 0.5f;
     private float timer = 0.0f;
-    public int limitBullet = 0;
-    private int count = 0;
-    private bool limitMode = false;
-    public bool useLimitMode = false;
-    private int showCount = 5;
-    public TextMeshProUGUI showCountText;
     private BulletMoveType bulletMoveType = BulletMoveType.Straight;
     private OnlineGameManager ogm;
     private bool isShoot = false;
 
+    [SyncVar] private float bulletSpeedMultiplier = 1f;
+    [SyncVar] private float bulletSizeMultiplier = 1f;
+
+    public float powerUpIncrease = 1f;
+
+    private enum PowerUpType
+    {
+        Speed,
+        BulletSpeed,
+        BulletSize
+    }
+
     private void Start()
     {
-        useLimitMode = ChooseMode.mode;
-        if (useLimitMode)
-        {
-            showCountText.text = "✖" + showCount.ToString();
-        }
         ogm = FindAnyObjectByType<OnlineGameManager>();
+        baseSpeed = speed;
     }
 
     void Update()
@@ -43,28 +47,57 @@ public class NetworkMove : NetworkBehaviour
         {
             isShoot = Input.GetKey(KeyCode.Space);
         }
-        if (isLocalPlayer && Input.GetKey(KeyCode.Space) && timer <= 0.0f && !limitMode)
+        if (isLocalPlayer && Input.GetKey(KeyCode.Space) && timer <= 0.0f)
         {
             var offset = bulletSpawnPoint.position - transform.position;
             CmdShoot(offset, transform.rotation, bulletMoveType);
             timer = interval;
-            if (showCount > 0 && useLimitMode)
-            {
-                count += 1;
-                showCount -= 1;
-                showCountText.text = "✖" + showCount.ToString();
-            }
-        }
-
-        if (count == limitBullet && useLimitMode)
-        {
-            limitMode = true;
         }
 
         if (timer > 0.0f)
         {
             timer -= Time.deltaTime;
         }
+    }
+    public void ApplyLocalPowerUp()
+    {
+        PowerUpType selectedPowerUp = (PowerUpType)Random.Range(0, 3);
+        Debug.Log($"[{netId}] Local PowerUp Selected: {selectedPowerUp}");
+        CmdApplyPowerUp(selectedPowerUp);
+    }
+    
+    [Command]
+    void CmdApplyPowerUp(PowerUpType powerUpType)
+    {
+        Debug.Log($"[Server] Applying PowerUp for {netId}: {powerUpType}");
+        Debug.Log($"[Server] Before - speed: {speed}, bulletSpeed: {bulletSpeedMultiplier}, bulletSize: {bulletSizeMultiplier}");
+        switch (powerUpType)
+        {
+            case PowerUpType.Speed:
+                speed += powerUpIncrease;
+                Debug.Log($"Power Up Applied - Speed: {powerUpIncrease}x");
+                TargetShowPowerUpEffect("移動速度", powerUpIncrease);
+                break;
+
+            case PowerUpType.BulletSpeed:
+                bulletSpeedMultiplier += powerUpIncrease;
+                Debug.Log($"Power Up Applied - Bullet Speed: {powerUpIncrease}x");
+                TargetShowPowerUpEffect("弾速", powerUpIncrease);
+                break;
+
+            case PowerUpType.BulletSize:
+                bulletSizeMultiplier += powerUpIncrease;
+                Debug.Log($"Power Up Applied - Bullet Size: {powerUpIncrease}x");
+                TargetShowPowerUpEffect("弾の大きさ", powerUpIncrease);
+                break;
+        }
+        Debug.Log($"[Server] After - speed: {speed}, bulletSpeed: {bulletSpeedMultiplier}, bulletSize: {bulletSizeMultiplier}");
+    }
+
+    [TargetRpc]
+    void TargetShowPowerUpEffect(string powerUpName, float multiplier)
+    {
+        Debug.Log($"[Client] My Power Up - {powerUpName}: {multiplier}x");
     }
 
     [Command]
@@ -75,11 +108,19 @@ public class NetworkMove : NetworkBehaviour
 
         Vector2 pos = new Vector2(transform.position.x, transform.position.y) + offset;
         GameObject bullet = Instantiate(prefabBullet, pos, rotation);
+
+        OnlineBulletMove bulletMove = bullet.GetComponent<OnlineBulletMove>();
+        if (bulletMove != null)
+        {
+            bulletMove.bulletMoveType = bulletMoveType;
+            bulletMove.speedMultiplier = bulletSpeedMultiplier;
+        }
+
+        bullet.transform.localScale *= bulletSizeMultiplier;
+
         NetworkServer.Spawn(bullet);
         pvpNetworkManager.MoveToScene(connectionToClient, bullet);
         bullet.GetComponent<Owner>().owner = netId;
-        bullet.GetComponent<OnlineBulletMove>().bulletMoveType = bulletMoveType;
-        Debug.Log("BulletNetID is " + bullet.GetComponent<Owner>().owner);
     }
 
     void FixedUpdate()

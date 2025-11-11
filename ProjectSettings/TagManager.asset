@@ -9,6 +9,7 @@ TagManager:
   - enemyBullet
   - MoveWall
   - Item
+  - Timer
   layers:
   - Default
   - TransparentFX
