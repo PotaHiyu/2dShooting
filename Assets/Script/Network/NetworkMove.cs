@@ -22,6 +22,7 @@ public class NetworkMove : NetworkBehaviour
 
     [SyncVar] private float bulletSpeedMultiplier = 1f;
     [SyncVar] private float bulletSizeMultiplier = 1f;
+    [SyncVar] public bool isRightSide = false;
 
     [Header("Power Up Settings")]
     public float powerUpIncrease = 5f;
@@ -212,6 +213,10 @@ public class NetworkMove : NetworkBehaviour
         if (ogm == null || ogm.gameState != GameState.Playing) return;
         float horizontalInput = Input.GetAxis("Horizontal");
         float verticalInput = Input.GetAxis("Vertical");
+        if (!isRightSide)
+        {
+            horizontalInput = -horizontalInput;
+        }
         float currentSpeed = isShoot ? speed / 2f : speed;
 
         Vector3 movement = new Vector3(horizontalInput, verticalInput, 0) * currentSpeed * Time.fixedDeltaTime;

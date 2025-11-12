@@ -203,10 +203,19 @@ public class PvPNetworkManager : NetworkManager
         conn.Send(new SceneMessage { sceneName = gameScene, sceneOperation =
             SceneOperation.LoadAdditive });
         yield return new WaitForEndOfFrame();
+
+        int playerIndex = currentMatch.NumberOfPlayers;
+
         base.OnServerAddPlayer(conn);
 
         SceneManager.MoveGameObjectToScene(conn.identity.gameObject,
             currentMatch.GameScene);
+        
+        NetworkMove networkMove = conn.identity.GetComponent<NetworkMove>();
+        if (networkMove != null)
+        {
+            networkMove.isRightSide = (playerIndex == 1);
+        }
         clientMatches.Add(conn.connectionId, currentMatch);
 
         if (currentMatch.AddPlayer(conn))
