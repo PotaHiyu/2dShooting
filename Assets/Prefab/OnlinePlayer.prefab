@@ -199,9 +199,20 @@ MonoBehaviour:
   syncDirection: 0
   syncMode: 0
   syncInterval: 0
-  prefabBullet: {fileID: 8500497175655295960, guid: 3d1a03090caae40118dfa6161dbec4af, type: 3}
+  speed: 5
+  prefabBulletNormal: {fileID: 8500497175655295960, guid: 3d1a03090caae40118dfa6161dbec4af, type: 3}
+  prefabBulletFast: {fileID: 8500497175655295960, guid: b950d936028354c1c9fb34321b0f17a9, type: 3}
+  prefabBulletDisappear: {fileID: 8500497175655295960, guid: e67b38d7ba8634209a5030ae499b27ab, type: 3}
   bulletSpawnPoint: {fileID: 4701042519557163682}
-  powerUpMultiplier: 1.5
+  powerUpIncrease: 1
+  initialSpeed: 5
+  initialBulletSpeed: 1
+  initialBulletSize: 1
+  maxSpeed: 20
+  maxBulletSpeed: 10
+  maxBulletSize: 5
+  useDebugMode: 1
+  debugPowerUpType: 1
 --- !u!114 &2147737970693114017
 MonoBehaviour:
   m_ObjectHideFlags: 0

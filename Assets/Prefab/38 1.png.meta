@@ -1,12 +1,5 @@
 fileFormatVersion: 2
-guid: 7dd8e3d11928baa41817c15c8b69bf9a
-AssetOrigin:
-  serializedVersion: 1
-  productId: 254453
-  packageName: 2D Bullet Lasers
-  packageVersion: 1.0
-  assetPath: Assets/iBeta Games/2D Bullet Laser Sprites/41.png
-  uploadId: 597731
+guid: 6706c835df9e24538a1b4300ac75623c
 TextureImporter:
   internalIDToNameTable: []
   externalObjects: {}

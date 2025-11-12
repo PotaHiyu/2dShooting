@@ -10,20 +10,40 @@ public class NetworkMove : NetworkBehaviour
     
     [SyncVar] public float speed = 5f;
     private float baseSpeed = 5f;
-    public GameObject prefabBullet;
+    public GameObject prefabBulletNormal;
+    public GameObject prefabBulletFast;
+    public GameObject prefabBulletDisappear;
     public Transform bulletSpawnPoint;
     private float interval = 0.5f;
     private float timer = 0.0f;
-    private BulletMoveType bulletMoveType = BulletMoveType.Straight;
+    private NetworkBulletMoveType bulletMoveType = NetworkBulletMoveType.Normal;
     private OnlineGameManager ogm;
     private bool isShoot = false;
 
     [SyncVar] private float bulletSpeedMultiplier = 1f;
     [SyncVar] private float bulletSizeMultiplier = 1f;
 
-    public float powerUpIncrease = 1f;
+    [Header("Power Up Settings")]
+    public float powerUpIncrease = 5f;
+    public float initialSpeed = 1f;
+    public float initialBulletSpeed = 1f;
+    public float initialBulletSize = 1f;
+    [Header("Max Limits")]
+    public float maxSpeed = 20f;
+    public float maxBulletSpeed = 15f;
+    public float maxBulletSize = 5f;
+    [Header("Debug Settings")]
+    public bool useDebugMode = false;
+    public PowerUpType debugPowerUpType = PowerUpType.Speed;
 
-    private enum PowerUpType
+    public enum NetworkBulletMoveType
+    {
+        Normal,
+        Fast,
+        Disappear
+    }
+
+    public enum PowerUpType
     {
         Speed,
         BulletSpeed,
@@ -33,15 +53,36 @@ public class NetworkMove : NetworkBehaviour
     private void Start()
     {
         ogm = FindAnyObjectByType<OnlineGameManager>();
-        baseSpeed = speed;
+        
+        if (isServer)
+        {
+            speed = initialSpeed;
+            baseSpeed = initialSpeed;
+            bulletSpeedMultiplier = initialBulletSpeed;
+            bulletSizeMultiplier = initialBulletSize;
+        }
     }
 
     void Update()
     {
         if (ogm == null || ogm.gameState != GameState.Playing) return;
-        if (isLocalPlayer && Input.GetKeyDown(KeyCode.V))
+        if (isLocalPlayer)
         {
-            bulletMoveType = BalletMove.NextBulletMoveType(bulletMoveType);
+            if (Input.GetKeyDown(KeyCode.J))
+            {
+                bulletMoveType = NetworkBulletMoveType.Normal;
+                Debug.Log("Bullet Type: Normal");
+            }
+            else if (Input.GetKeyDown(KeyCode.K))
+            {
+                bulletMoveType = NetworkBulletMoveType.Fast;
+                Debug.Log("Bullet Type: Fast");
+            }
+            else if (Input.GetKeyDown(KeyCode.L))
+            {
+                bulletMoveType = NetworkBulletMoveType.Disappear;
+                Debug.Log("Bullet Type: Disappear");
+            }
         }
         if (isLocalPlayer)
         {
@@ -61,7 +102,15 @@ public class NetworkMove : NetworkBehaviour
     }
     public void ApplyLocalPowerUp()
     {
-        PowerUpType selectedPowerUp = (PowerUpType)Random.Range(0, 3);
+        PowerUpType selectedPowerUp;
+        if (useDebugMode)
+        {
+            selectedPowerUp = debugPowerUpType;
+        }
+        else
+        {
+            selectedPowerUp = (PowerUpType)Random.Range(0, 3);
+        }
         Debug.Log($"[{netId}] Local PowerUp Selected: {selectedPowerUp}");
         CmdApplyPowerUp(selectedPowerUp);
     }
@@ -74,21 +123,21 @@ public class NetworkMove : NetworkBehaviour
         switch (powerUpType)
         {
             case PowerUpType.Speed:
-                speed += powerUpIncrease;
-                Debug.Log($"Power Up Applied - Speed: {powerUpIncrease}x");
-                TargetShowPowerUpEffect("移動速度", powerUpIncrease);
+                speed = Mathf.Min(speed + powerUpIncrease, maxSpeed);
+                Debug.Log($"Power Up Applied - Speed: {speed}x");
+                TargetShowPowerUpEffect("移動速度", speed);
                 break;
 
             case PowerUpType.BulletSpeed:
-                bulletSpeedMultiplier += powerUpIncrease;
-                Debug.Log($"Power Up Applied - Bullet Speed: {powerUpIncrease}x");
-                TargetShowPowerUpEffect("弾速", powerUpIncrease);
+                bulletSpeedMultiplier = Mathf.Min(bulletSpeedMultiplier + powerUpIncrease, maxBulletSpeed);
+                Debug.Log($"Power Up Applied - Bullet Speed: {bulletSpeedMultiplier}x");
+                TargetShowPowerUpEffect("弾速", bulletSpeedMultiplier);
                 break;
 
             case PowerUpType.BulletSize:
-                bulletSizeMultiplier += powerUpIncrease;
-                Debug.Log($"Power Up Applied - Bullet Size: {powerUpIncrease}x");
-                TargetShowPowerUpEffect("弾の大きさ", powerUpIncrease);
+                bulletSizeMultiplier = Mathf.Min(bulletSizeMultiplier + powerUpIncrease, maxBulletSize);
+                Debug.Log($"Power Up Applied - Bullet Size: {bulletSizeMultiplier}x");
+                TargetShowPowerUpEffect("弾の大きさ", bulletSizeMultiplier);
                 break;
         }
         Debug.Log($"[Server] After - speed: {speed}, bulletSpeed: {bulletSpeedMultiplier}, bulletSize: {bulletSizeMultiplier}");
@@ -101,18 +150,37 @@ public class NetworkMove : NetworkBehaviour
     }
 
     [Command]
-    void CmdShoot(Vector2 offset, Quaternion rotation, BulletMoveType bulletMoveType)
+    void CmdShoot(Vector2 offset, Quaternion rotation, NetworkBulletMoveType bulletMoveType)
     {
         var pvpNetworkManager = FindFirstObjectByType<PvPNetworkManager>();
         if (pvpNetworkManager == null) return;
 
+        GameObject bulletPrefab = null;
+        switch (bulletMoveType)
+        {
+            case NetworkBulletMoveType.Normal:
+                bulletPrefab = prefabBulletNormal;
+                break;
+            case NetworkBulletMoveType.Fast:
+                bulletPrefab = prefabBulletFast;
+                break;
+            case NetworkBulletMoveType.Disappear:
+                bulletPrefab = prefabBulletDisappear;
+                break;
+        }
+
+        if (bulletPrefab == null)
+        {
+            Debug.LogError($"Bullet prefab for {bulletMoveType} is not assigned!");
+            return;
+        }
+
         Vector2 pos = new Vector2(transform.position.x, transform.position.y) + offset;
-        GameObject bullet = Instantiate(prefabBullet, pos, rotation);
+        GameObject bullet = Instantiate(bulletPrefab, pos, rotation);
 
         OnlineBulletMove bulletMove = bullet.GetComponent<OnlineBulletMove>();
         if (bulletMove != null)
         {
-            bulletMove.bulletMoveType = bulletMoveType;
             bulletMove.speedMultiplier = bulletSpeedMultiplier;
         }
 
