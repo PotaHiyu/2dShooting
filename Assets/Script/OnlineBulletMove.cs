@@ -35,12 +35,12 @@ public class OnlineBulletMove : NetworkBehaviour
             switch (bulletMoveType)
             {
                 case NetworkMove.NetworkBulletMoveType.Normal:
-                    rand = Random.Range(-0.01f, 0.01f);
+                    rand = Random.Range(-0.03f, 0.03f);
                     speed = baseSpeed * speedMultiplier;
                     break;
                 case NetworkMove.NetworkBulletMoveType.Fast:
+                    rand = Random.Range(-0.01f, 0.01f);
                     speed = baseSpeed * fastSpeed;
-                    rand = Random.Range(-0.03f, 0.03f);
                     break;
                 case NetworkMove.NetworkBulletMoveType.Disappear:
                     rand = 0f;

@@ -36,6 +36,10 @@ public class NetworkMove : NetworkBehaviour
     public bool useDebugMode = false;
     public PowerUpType debugPowerUpType = PowerUpType.Speed;
 
+    public float normalInterval = 0.5f;
+    public float fastInterval = 0.8f;
+    public float disappearInterval = 1f;
+
     public enum NetworkBulletMoveType
     {
         Normal,
@@ -92,7 +96,19 @@ public class NetworkMove : NetworkBehaviour
         {
             var offset = bulletSpawnPoint.position - transform.position;
             CmdShoot(offset, transform.rotation, bulletMoveType);
-            timer = interval;
+            
+            switch (bulletMoveType)
+            {
+                case NetworkBulletMoveType.Normal:
+                    timer = normalInterval;
+                    break;
+                case NetworkBulletMoveType.Fast:
+                    timer = fastInterval;
+                    break;
+                case NetworkBulletMoveType.Disappear:
+                    timer = disappearInterval;
+                    break;
+            }
         }
 
         if (timer > 0.0f)
