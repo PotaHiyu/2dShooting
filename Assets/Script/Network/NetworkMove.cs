@@ -41,6 +41,9 @@ public class NetworkMove : NetworkBehaviour
     public float fastInterval = 0.8f;
     public float disappearInterval = 1f;
 
+    public AudioClip shootSound;
+    private AudioSource audioSource;
+
     public enum NetworkBulletMoveType
     {
         Normal,
@@ -58,6 +61,7 @@ public class NetworkMove : NetworkBehaviour
     private void Start()
     {
         ogm = FindAnyObjectByType<OnlineGameManager>();
+        audioSource = GetComponent<AudioSource>();
         
         if (isServer)
         {
@@ -95,6 +99,7 @@ public class NetworkMove : NetworkBehaviour
         }
         if (isLocalPlayer && Input.GetKey(KeyCode.Space) && timer <= 0.0f)
         {
+            PlayShootSound();
             var offset = bulletSpawnPoint.position - transform.position;
             CmdShoot(offset, transform.rotation, bulletMoveType);
             
@@ -115,6 +120,14 @@ public class NetworkMove : NetworkBehaviour
         if (timer > 0.0f)
         {
             timer -= Time.deltaTime;
+        }
+    }
+
+    void PlayShootSound()
+    {
+        if (shootSound != null && audioSource != null)
+        {
+            audioSource.PlayOneShot(shootSound);
         }
     }
     public void ApplyLocalPowerUp()
