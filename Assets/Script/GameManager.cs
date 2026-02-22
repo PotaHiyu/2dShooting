@@ -37,6 +37,7 @@ public class GameManager : MonoBehaviour
     public TextMeshProUGUI scoreText;
     private TextMeshProUGUI scoreTextCom;
     private DontDestroyOnLoad dontDestroyObj;
+    private bool hasGameOverStarted = false;
 
     void Start()
     {
@@ -60,7 +61,7 @@ public class GameManager : MonoBehaviour
         speedMultiplier += speedIncreasePerScore * Time.deltaTime;
         intervalMultiplier += intervalDecreasePerScore * Time.deltaTime;
 
-        enemyHpBonus = Mathf.FloorToInt(score / 100f);
+        enemyHpBonus = Mathf.FloorToInt(score / 200f);
 
         if (isWin)
         {
@@ -69,12 +70,13 @@ public class GameManager : MonoBehaviour
         }
         if (isLose)
         {
-            clearText.SetActive(true);
-            scoreTextCom.text = "GAME OVER?\n\nYour score\n" + Mathf.FloorToInt(score).ToString();
             StartCoroutine(GameOver());
         }
-
-        scoreText.text = Mathf.FloorToInt(score).ToString();
+        
+        if (!hasGameOverStarted)
+        {
+            scoreText.text = Mathf.FloorToInt(score).ToString();
+        }
     }
 
     IEnumerator SpawnLoop()
@@ -120,8 +122,14 @@ public class GameManager : MonoBehaviour
 
     IEnumerator GameOver()
     {
-        Debug.Log("GAME OVER");
+        if (hasGameOverStarted)
+        yield break;
+    
+        hasGameOverStarted = true;
+        Debug.Log("GAME OVER!!!");
         dontDestroyObj.score = score;
+        clearText.SetActive(true);
+        scoreTextCom.text = "GAME OVER?\n\nYour score\n" + Mathf.FloorToInt(score).ToString();
         yield return new WaitForSeconds(3f);
         SceneManager.LoadScene(gameOverSceneName);
     }

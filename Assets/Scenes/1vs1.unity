@@ -1561,11 +1561,6 @@ MonoBehaviour:
   serverOnly: 0
   visibility: 0
   hasSpawned: 0
---- !u!1 &1749591745 stripped
-GameObject:
-  m_CorrespondingSourceObject: {fileID: 6881937608883404717, guid: 660a6082253794e5d817b575fab5565d, type: 3}
-  m_PrefabInstance: {fileID: 1849591406}
-  m_PrefabAsset: {fileID: 0}
 --- !u!1001 &1849591406
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -1574,18 +1569,6 @@ PrefabInstance:
     serializedVersion: 3
     m_TransformParent: {fileID: 2103745239}
     m_Modifications:
-    - target: {fileID: 6881937608883404715, guid: 660a6082253794e5d817b575fab5565d, type: 3}
-      propertyPath: m_RootOrder
-      value: 5
-      objectReference: {fileID: 0}
-    - target: {fileID: 6881937608883404715, guid: 660a6082253794e5d817b575fab5565d, type: 3}
-      propertyPath: m_LocalScale.x
-      value: 1.5
-      objectReference: {fileID: 0}
-    - target: {fileID: 6881937608883404715, guid: 660a6082253794e5d817b575fab5565d, type: 3}
-      propertyPath: m_LocalScale.y
-      value: 1
-      objectReference: {fileID: 0}
     - target: {fileID: 6881937608883404715, guid: 660a6082253794e5d817b575fab5565d, type: 3}
       propertyPath: m_LocalPosition.x
       value: 0
@@ -1633,32 +1616,13 @@ PrefabInstance:
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
-    m_AddedComponents:
-    - targetCorrespondingSourceObject: {fileID: 6881937608883404717, guid: 660a6082253794e5d817b575fab5565d, type: 3}
-      insertIndex: 1
-      addedObject: {fileID: 1849591409}
+    m_AddedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 660a6082253794e5d817b575fab5565d, type: 3}
 --- !u!4 &1849591407 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: 6881937608883404715, guid: 660a6082253794e5d817b575fab5565d, type: 3}
   m_PrefabInstance: {fileID: 1849591406}
   m_PrefabAsset: {fileID: 0}
---- !u!114 &1849591409
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1749591745}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 3e7b670c4c34046899b3ece7849bbd30, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  moveDistance: 3
-  moveSpeed: 2
-  rotationSpeed: 90
-  totalCycles: 4
 --- !u!1 &1928355061
 GameObject:
   m_ObjectHideFlags: 0

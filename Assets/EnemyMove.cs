@@ -15,9 +15,10 @@ public class EnemyMove : MonoBehaviour
     public GameObject prefabBulletEnemy;
     public GameObject prefabBomb;
     public float moveSpeed = 5f;
-    public float interval = 3f;
+    public float interval = 10f;
 
     public int health = 1;
+    public int maxHealth = 20;
     public bool isUseGun = true;
     public bool canShoot = false;
 

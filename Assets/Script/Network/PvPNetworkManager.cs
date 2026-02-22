@@ -5,39 +5,6 @@ using Mirror;
 using System.Collections;
 using System.Collections.Generic;
 
-public class Match
-{
-    public Match(Scene scene, int maxPlayers)
-    {
-        GameScene = scene;
-        MaxPlayers = maxPlayers;
-        players = new NetworkConnectionToClient[maxPlayers];
-        NumberOfPlayers = 0;
-    }
-
-    public bool AddPlayer(NetworkConnectionToClient conn)
-    {
-        players[NumberOfPlayers] = conn;
-        NumberOfPlayers++;
-        Debug.Log($"Added: Match now has {NumberOfPlayers} / {MaxPlayers} players...");
-        return IsFull;
-    }
-
-    public Scene GameScene { get; }
-    public bool IsEmpty => NumberOfPlayers <= 0;
-    public bool IsFull => NumberOfPlayers >= MaxPlayers;
-    public int MaxPlayers { get; }
-    public int NumberOfPlayers { get; private set; }
-    public NetworkConnectionToClient[] players;
-
-    public bool RemovePlayer()
-    {
-        NumberOfPlayers--;
-        Debug.Log($"Removed: Match now has {NumberOfPlayers} / {MaxPlayers} players...");
-        return IsEmpty;
-    }
-}
-
 /*
 	Documentation: https://mirror-networking.gitbook.io/docs/components/network-manager
 	API Reference: https://mirror-networking.com/docs/api/Mirror.NetworkManager.html
@@ -50,7 +17,6 @@ public class PvPNetworkManager : NetworkManager
     // Overrides the base singleton so we don't
     // have to cast to this type everywhere.
     public static new PvPNetworkManager singleton => (PvPNetworkManager)NetworkManager.singleton;
-    private bool subsceneLoaded = false;
     [Scene]
     public string gameScene;
     private Match currentMatch = null;
@@ -164,6 +130,54 @@ public class PvPNetworkManager : NetworkManager
     public override void OnClientSceneChanged()
     {
         base.OnClientSceneChanged();
+        
+        // 1vs1シーンがロードされた場合、それをアクティブシーンに設定
+        Scene gameScene = default;
+        for (int i = 0; i < SceneManager.sceneCount; i++)
+        {
+            Scene scene = SceneManager.GetSceneAt(i);
+            if (scene.name == "1vs1")
+            {
+                Debug.Log($"[CLIENT] Setting 1vs1 scene as active scene");
+                SceneManager.SetActiveScene(scene);
+                gameScene = scene;
+                break;
+            }
+        }
+        
+        // クライアント側でも自分のプレイヤーオブジェクトを1vs1シーンに移動
+        Debug.Log($"[CLIENT] gameScene.IsValid(): {gameScene.IsValid()}, NetworkClient.localPlayer: {NetworkClient.localPlayer != null}");
+        if (gameScene.IsValid() && NetworkClient.localPlayer != null)
+        {
+            Debug.Log($"[CLIENT] Moving local player to 1vs1 scene");
+            SceneManager.MoveGameObjectToScene(NetworkClient.localPlayer.gameObject, gameScene);
+        }
+        else if (gameScene.IsValid())
+        {
+            Debug.Log($"[CLIENT] 1vs1 scene is valid but localPlayer is null, waiting...");
+            StartCoroutine(WaitForLocalPlayerAndMove(gameScene));
+        }
+    }
+
+    IEnumerator WaitForLocalPlayerAndMove(Scene targetScene)
+    {
+        float timeout = 5.0f;
+        while (NetworkClient.localPlayer == null && timeout > 0)
+        {
+            Debug.Log($"[CLIENT] Waiting for localPlayer... timeout: {timeout:F1}");
+            yield return new WaitForSeconds(0.2f);
+            timeout -= 0.2f;
+        }
+        
+        if (NetworkClient.localPlayer != null && targetScene.IsValid())
+        {
+            Debug.Log($"[CLIENT] Found localPlayer, moving to 1vs1 scene");
+            SceneManager.MoveGameObjectToScene(NetworkClient.localPlayer.gameObject, targetScene);
+        }
+        else
+        {
+            Debug.LogError($"[CLIENT] Failed to find localPlayer after timeout or scene became invalid");
+        }
     }
 
     #endregion
@@ -199,12 +213,15 @@ public class PvPNetworkManager : NetworkManager
 
     IEnumerator OnServerAddPlayerDelayed(NetworkConnectionToClient conn)
     {
+        Debug.Log($"[SERVER] OnServerAddPlayerDelayed called for connection {conn.connectionId}");
         while (!matchReady) yield return null;
+        Debug.Log($"[SERVER] Match is ready, sending scene message to client {conn.connectionId}");
         conn.Send(new SceneMessage { sceneName = gameScene, sceneOperation =
             SceneOperation.LoadAdditive });
-        yield return new WaitForEndOfFrame();
+        yield return new WaitForSeconds(2.0f);
 
         int playerIndex = currentMatch.NumberOfPlayers;
+        Debug.Log($"[SERVER] Adding player {conn.connectionId} as player index {playerIndex}");
 
         base.OnServerAddPlayer(conn);
 
@@ -218,8 +235,10 @@ public class PvPNetworkManager : NetworkManager
         }
         clientMatches.Add(conn.connectionId, currentMatch);
 
+        Debug.Log($"[SERVER] Current match has {currentMatch.NumberOfPlayers} players, max: {currentMatch.MaxPlayers}");
         if (currentMatch.AddPlayer(conn))
         {
+            Debug.Log($"[SERVER] Match is full! Starting game...");
             Match thisMatch = currentMatch;
             currentMatch = null;
             yield return StartCoroutine(ServerLoadSubScene());
@@ -228,7 +247,15 @@ public class PvPNetworkManager : NetworkManager
             foreach (NetworkConnectionToClient player in thisMatch.players)
             {
                 GameStart gs = player.identity.GetComponent<GameStart>();
-                if (gs != null) gs.RpcStartCountdown(matchCountdown);
+                if (gs != null) 
+                {
+                    Debug.Log($"[SERVER] Calling RpcStartCountdown({matchCountdown}) for player {player.connectionId}");
+                    gs.RpcStartCountdown(matchCountdown);
+                }
+                else
+                {
+                    Debug.LogError($"[SERVER] GameStart component not found on player {player.connectionId}");
+                }
             }
             yield return new WaitForSeconds(matchCountdown);
             foreach (NetworkConnectionToClient player in thisMatch.players)
